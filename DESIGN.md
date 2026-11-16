@@ -1,6 +1,6 @@
 # Design brief — Selim Saleh
 
-_Draft v5, 16 Nov 2026, written with Claude from Selim's answers, his writing, and the natochi.cv reference. Items marked **OPEN** still need Selim's call._
+_Draft v6, 16 Nov 2026, written with Claude from Selim's answers, his writing, and the natochi.cv reference. Items marked **OPEN** still need Selim's call._
 
 ## 1. Feeling
 - **Three words:** nostalgic, quiet, hopeful. (Melancholy that still faces forward: "nostalgia is the evidence submitted in the courtroom of existence.")
@@ -17,7 +17,7 @@ _Draft v5, 16 Nov 2026, written with Claude from Selim's answers, his writing, a
 
 ## 3. Look
 - **Reference decisions taken from natochi.cv:** one drawing is the whole page; tabs are small labels sitting on twigs that grow off the drawing; very little type, all lowercase and small; two or three colours; no headings, panels, badges or decoration; a back button and a music pill are the only controls.
-- **Concept: the name.** The centre is سليم written in Ruq'ah handwriting, made of points, with a small note on a twig: "selim, in arabic". Each tab (me, the paper, thesis, projects, after hours) is a label on a twig growing off the letters. Under the name runs a trail of dust from "cairo" to "munich", 2,700 km. No orbits (they read as self-important).
+- **Concept: the name.** The centre is سليم written in Ruq'ah handwriting, made of points, with a small note on a twig: "selim, in arabic". Each tab (me, the paper, thesis, projects, after hours) is a label on a twig growing off the letters. Under the name runs a trail of dust from "cairo" to "munich" (no distance shown here; the 2,700 km counter lives in the "me" animation). No orbits (they read as self-important).
 - **Journey (scroll):** centre → me → ex-ionity → ex-tactful → centre → the paper → centre → thesis → centre → projects → centre → after hours → centre (say hello). Every trip to or from the centre passes through one point of light. Labels also jump straight to their stop.
 - **Stops:**
   - me: Cairo → Munich dot map; a short line in Selim's own voice; education.
@@ -28,15 +28,16 @@ _Draft v5, 16 Nov 2026, written with Claude from Selim's answers, his writing, a
   - projects: one section, a note on why (getting better at more tools, exploring more things), then procure-agent-lite, Ladewüste, morehere. with links. No hallucination-resistant RAG.
   - after hours: films, photographs, writing (Substack), watching (Letterboxd).
 - **Colour:** deep blue sheet `#13244a` (to `#0e1b3a` at the edges), dark grey frame `#17181b`, light grey ink `#d8dbe0`, mid grey `#8e96a6`. No accent colour; emphasis is brightness and underline only.
-- **Type (OPEN, two options in the sketch):** "pen" = Reenie Beanie handwriting for labels + Fraunces for reading text; "plain" = one sans (Instrument Sans) for everything, closest to the reference. Arabic: Aref Ruqaa. All open-licensed, self-hosted; adding them needs Selim's OK.
+- **Type:** all reading text in one sans (Instrument Sans). Titles, tabs and labels on the drawing use a second voice. **OPEN, Selim to pick** from the sketch switch (comparison sheet: `design/sketch/title-fonts.png`): italic (Instrument Serif italic, recommended), gloock, pen (Reenie Beanie), marker (Rock Salt), bold (same sans). Arabic: Aref Ruqaa. All open-licensed, self-hosted; adding them needs Selim's OK.
+- **Lists:** anything that is a list reads as one, one item per line: tool stacks, education, projects, after hours, contact links, the song list.
 - **Fixed elements:** name + one line ("data & ai engineer, munich. free from december 2026."), the "in a hurry?" links, a back-to-centre button, the tape.
-- **The tape:** a small pill with Selim's favourite songs (next / play). Recommended build: each song opens on Spotify or YouTube, and an embedded player loads only after a click, so no third-party cookies load by default. **OPEN:** the song list.
+- **The tape:** a pill with Selim's six songs; the title opens the full list, "»" skips, "▶" opens the song on Spotify. Songs: All My Friends (LCD Soundsystem), Weird Fishes (Radiohead), Turbines (Black Country, New Road), Long Season (Fishmans), Master of None (Beach House), Rinsed (Dean Blunt). Build: Spotify player loads only after a click, so nothing third-party loads by default; needs the six Spotify track links.
 - **Texture:** stipple and paper grain. Motion is scroll-driven and stops for `prefers-reduced-motion`.
 
 ## 4. Home page
-- **Line under "me" (OPEN, Selim to pick or merge):** see the options in the conversation; the sketch uses his Substack line.
-- **For recruiters:** "in a hurry? cv · projects · paper · github · email" always visible, plus "free from december 2026".
-- **Still needed from Selim:** LinkedIn URL; the CV PDF (`public/Selim_Saleh_CV.pdf`, phone number removed); song list; IONITY and Tactful logo files; links for Ladewüste and morehere.; films and photographs.
+- **Text under "me" (Selim's words):** "for a living, i teach code, engineer data and train LLMs. i also watch/make movies, read books, blast music, and rant (sometimes complain) about them all. i left cairo with a carefully orchestrated plan. the plan changed. i kept the curiosity."
+- **For recruiters:** "in a hurry? projects · paper · github · linkedin · email" always visible, plus "free from december 2026". The CV link returns when the PDF is added.
+- **Still needed from Selim:** title font choice; the CV PDF later (`public/Selim_Saleh_CV.pdf`, phone number removed); Spotify links for the six songs; IONITY and Tactful logo files; links for Ladewüste and morehere.; films and photographs.
 
 ## 5. Sections
 - **Top level:** projects · research · cv · about · **after hours** (a hub page: films, photographs, writing, now, each with its own detail pages)
@@ -47,7 +48,7 @@ _Draft v5, 16 Nov 2026, written with Claude from Selim's answers, his writing, a
 ## 6. Practical
 - **Name:** selim saleh (lowercase in the interface, which matches the Substack voice)
 - **Email to show:** selimmoftahsaleh@gmail.com, as a mailto assembled in JS (never plain text in the HTML)
-- **Links:** GitHub (sxlimsxleh), Substack (selimsaleh), Letterboxd (seleemmofta7), LinkedIn (URL OPEN), Instagram (OPEN)
+- **Links:** GitHub (sxlimsxleh), LinkedIn (linkedin.com/in/selimsaleh), Substack (selimsaleh), Letterboxd (seleemmofta7), Instagram (OPEN)
 - **Domain:** OPEN (see note: a web address like selimsaleh.com, about €10–15/year, bought later)
 - **Languages:** English first. Arabic later, with the right-to-left layout considered from the start.
 
