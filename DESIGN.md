@@ -1,10 +1,10 @@
 # Design brief — Selim Saleh
 
-_Draft v4, 16 Nov 2026, written with Claude from Selim's answers, his writing, and the natochi.cv reference. Items marked **OPEN** still need Selim's call._
+_Draft v5, 16 Nov 2026, written with Claude from Selim's answers, his writing, and the natochi.cv reference. Items marked **OPEN** still need Selim's call._
 
 ## 1. Feeling
 - **Three words:** nostalgic, quiet, hopeful. (Melancholy that still faces forward: "nostalgia is the evidence submitted in the courtroom of existence.")
-- **After 10 seconds a visitor should remember:** a name in Arabic handwriting made of light, with everything else orbiting it, and handwriting everywhere.
+- **After 10 seconds a visitor should remember:** a name in Arabic handwriting made of points of light on deep blue, with everything else growing off it.
 - **Engineer vs artist:** the site should flex two things: technical ability and career (the journey, and the fact that it is hand-built), and taste (type, restraint, references). Priority order: about me, career, paper, thesis, projects, after hours.
 - **The thread between both sides: evidence.** The work is about AI that shows its sources (grounded extraction, citation-faithful legal QA, data-quality checks); the writing is about nostalgia as evidence ("I was here. I loved. I was loved. I lived.").
 
@@ -16,34 +16,27 @@ _Draft v4, 16 Nov 2026, written with Claude from Selim's answers, his writing, a
 - **Never:** template portfolio look, gradients-and-glass "tech" style, stock hero photos, skill bars, cursor gimmicks, auto-playing sound, copying anyone's signature visual (natochi's tree, Lynch's curtains, Ghibli imagery).
 
 ## 3. Look
-- **Concept: "the centre, and the journey out."** The home page is one continuous scroll made of points of light. It opens on a centre point: Selim's name in Arabic handwriting (سليم, Ruq'ah style) with five orbits around it, one per stop. After each stop you fall back into the centre and leave again for the next one. The café table is dropped.
-- **Order (decided by Selim):**
-  1. the centre (name, one line, the rotating "listening / watched / wrote" line)
-  2. about me: Cairo → Munich map, education
-  3. about me · career: **ex-IONITY** (wordmark in dots, charging stations across Europe, the data-quality framework)
-  4. about me · career: **ex-Tactful** (wordmark in dots; messy client sources → NiFi + Airflow → reports and demos)
-  5. centre → **the paper** (passages, the answer, attribution threads, re-ranking)
-  6. centre → **thesis** (the points translate كيف حالك؟ into إزيك؟ on a loop)
-  7. centre → **projects**: ONE section. A short note on what the projects are for (getting better at more tools, exploring more things), then small entries with links: procure-agent-lite, Ladewüste, morehere., hallucination-resistant RAG. Hovering an entry lights up its drawing.
-  8. centre → **after hours** (films, photographs, writing, now)
-  9. back at the centre: contact
-- **Transitions:** every trip to or from the centre passes through one point of light: the scene falls into it, then opens out into the next. No loose clouds. Text fades in step with its picture.
-- **No IONITY project chapter.** IONITY and Tactful are career beats inside about me.
-- **Colour:** unchanged. Warm dark room `#100e11`, tungsten ink `#ece2c9`, dim `#9a9080`, camcorder orange `#ff8f3f`.
-- **Typography: sketchy, not "developer tool".** Three roles: a hand-drawn display face for names and headings (slightly rotated, with a scribbled underline), a handwriting face for notes, labels and links, a typewriter face for body text (screenplay feel), and VT323 for the camcorder read-out. Candidate sets in the sketch's switcher (**OPEN, Selim to pick**):
-  - **marker:** Rock Salt + Reenie Beanie + Special Elite
-  - **scribble:** Rubik Scribble + Covered By Your Grace + Courier Prime
-  - **tall:** Sue Ellen Francisco + Reenie Beanie + Courier Prime
-  - Arabic: Aref Ruqaa. All fonts are open-licensed (SIL OFL) and would be self-hosted; adding them needs Selim's OK (dependency rule).
-- **Layout:** no cards, panels or tick-mark navigation. The orbit labels are the navigation. Fixed chrome is only: name (back to the centre), camcorder read-out, and the "in a hurry?" line.
-- **Motion:** scroll-driven; with `prefers-reduced-motion` scenes switch without flight and loops are still.
-- **Texture:** film grain and a soft vignette.
+- **Reference decisions taken from natochi.cv:** one drawing is the whole page; tabs are small labels sitting on twigs that grow off the drawing; very little type, all lowercase and small; two or three colours; no headings, panels, badges or decoration; a back button and a music pill are the only controls.
+- **Concept: the name.** The centre is سليم written in Ruq'ah handwriting, made of points, with a small note on a twig: "selim, in arabic". Each tab (me, the paper, thesis, projects, after hours) is a label on a twig growing off the letters. Under the name runs a trail of dust from "cairo" to "munich", 2,700 km. No orbits (they read as self-important).
+- **Journey (scroll):** centre → me → ex-ionity → ex-tactful → centre → the paper → centre → thesis → centre → projects → centre → after hours → centre (say hello). Every trip to or from the centre passes through one point of light. Labels also jump straight to their stop.
+- **Stops:**
+  - me: Cairo → Munich dot map; a short line in Selim's own voice; education.
+  - ex-ionity (Dec 2024 – Nov 2026): wordmark in dots, stations across Europe, one sentence, then the tool stack (python, pandas, pyarrow, parquet, aws athena, s3, glue, airflow, codeartifact). No list of checks.
+  - ex-tactful (Nov 2022 – Jan 2024): wordmark in dots; client sources → nifi + airflow → reports and demos.
+  - the paper: passages, answer, attribution threads; link straight to https://arxiv.org/abs/2606.03728.
+  - thesis: "teaching a model to speak masry"; كيف حالك؟ rearranges into إزيك؟.
+  - projects: one section, a note on why (getting better at more tools, exploring more things), then procure-agent-lite, Ladewüste, morehere. with links. No hallucination-resistant RAG.
+  - after hours: films, photographs, writing (Substack), watching (Letterboxd).
+- **Colour:** deep blue sheet `#13244a` (to `#0e1b3a` at the edges), dark grey frame `#17181b`, light grey ink `#d8dbe0`, mid grey `#8e96a6`. No accent colour; emphasis is brightness and underline only.
+- **Type (OPEN, two options in the sketch):** "pen" = Reenie Beanie handwriting for labels + Fraunces for reading text; "plain" = one sans (Instrument Sans) for everything, closest to the reference. Arabic: Aref Ruqaa. All open-licensed, self-hosted; adding them needs Selim's OK.
+- **Fixed elements:** name + one line ("data & ai engineer, munich. free from december 2026."), the "in a hurry?" links, a back-to-centre button, the tape.
+- **The tape:** a small pill with Selim's favourite songs (next / play). Recommended build: each song opens on Spotify or YouTube, and an embedded player loads only after a click, so no third-party cookies load by default. **OPEN:** the song list.
+- **Texture:** stipple and paper grain. Motion is scroll-driven and stops for `prefers-reduced-motion`.
 
 ## 4. Home page
-- **Identity line (OPEN, draft):** "data & ai engineer. munich, by way of cairo."
-- **For recruiters:** "in a hurry? cv · projects · paper · github · email" is always visible; orbit labels jump straight to any stop.
-- **Signature element:** the rotating line under the name (song · last film · a line from Selim's writing), fed from the `now` file.
-- **Open content questions:** IONITY end date (the CV file still says "present"); the real IONITY and Tactful logos as SVG; real station locations (open data) to replace the placeholder dots; links for the paper and three projects.
+- **Line under "me" (OPEN, Selim to pick or merge):** see the options in the conversation; the sketch uses his Substack line.
+- **For recruiters:** "in a hurry? cv · projects · paper · github · email" always visible, plus "free from december 2026".
+- **Still needed from Selim:** LinkedIn URL; the CV PDF (`public/Selim_Saleh_CV.pdf`, phone number removed); song list; IONITY and Tactful logo files; links for Ladewüste and morehere.; films and photographs.
 
 ## 5. Sections
 - **Top level:** projects · research · cv · about · **after hours** (a hub page: films, photographs, writing, now, each with its own detail pages)
@@ -60,5 +53,5 @@ _Draft v4, 16 Nov 2026, written with Claude from Selim's answers, his writing, a
 
 ## Technical notes for the build
 - The home image is drawn with a small vanilla-JS canvas script (no libraries; about 6k points). **The links are real HTML `<a>` elements laid over the canvas**, so keyboard use, screen readers, search engines and Lighthouse all work. Without JS, the page shows a static drawing plus the links.
-- Prototypes: `design/sketch/journey.html` (v3, current), `rabbithole.html` (v2), `home.html` (v1), `home-v0.html` (first table). Throwaways, not production code.
+- Prototypes: `design/sketch/journey.html` (v4, current), `journey-v3.html`, `rabbithole.html` (v2), `home.html` (v1), `home-v0.html` (first table). Throwaways, not production code.
 - Production: one canvas island on the home page only, vanilla JS (no three.js) unless point counts need WebGL; all chapter text is real HTML; inner pages (projects, cv, research, after hours) are plain, fast, static Astro pages in the same palette.

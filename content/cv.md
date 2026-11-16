@@ -13,7 +13,7 @@ languages:
 M.Sc. Data Engineering and Analytics student at TUM with a background spanning production data engineering, machine learning and AI systems. I like building things that are technically solid and actually useful: scalable cloud pipelines, retrieval systems, AI evaluation workflows. I'm drawn to complex problems where good engineering and real-world impact go hand in hand.
 
 ## Work
-### Data Science and Engineering — Working Student · IONITY · Munich · Dec 2024 – present
+### Data Science and Engineering — Working Student · IONITY · Munich · Dec 2024 – Nov 2026
 - Built schema-driven data-quality validation pipelines in Python (Pandas, PyArrow) on AWS (Athena, S3, Glue) orchestrated with Airflow.
 - Automated checks for schema compliance, missing values, data types, categories, primary keys, partitions, timestamps and numerical constraints.
 - Integrated validation into production pipelines; debugged Athena queries, Parquet schema mismatches, Glue jobs, dependency conflicts and CodeArtifact packaging.
@@ -32,7 +32,7 @@ Thesis: adapting a large language model to prefer Egyptian Arabic dialect (submi
 ### B.Sc. Media Engineering and Technology (Computer Science) · German University in Cairo · 2017 – 2022
 
 ## Publications
-- **Re-Ranking Through an Attribution Lens for Citation Quality in Legal QA** — Mohamed Hesham Elganayni, Selim Saleh, Matthias Grabmair. Accepted at ASAIL 2026. (Add link/PDF when public.)
+- **Re-Ranking Through an Attribution Lens for Citation Quality in Legal QA** — Mohamed Hesham Elganayni, Selim Saleh, Matthias Grabmair. ASAIL 2026. https://arxiv.org/abs/2606.03728
 
 ## Skills
 - Programming & data science: Python, Java, SQL, Pandas, NumPy, scikit-learn, Matplotlib
