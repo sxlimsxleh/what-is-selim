@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>selim saleh — sketch</title>
+<meta name="description" content="Design sketch: a café table at night, drawn in points of light.">
+<style>
+  :root {
+    --bg: #100e11;          /* the dark room */
+    --ink: #ece2c9;         /* warm tungsten light */
+    --ink-dim: #8f8676;
+    --stamp: #ff8f3f;       /* camcorder date-stamp orange */
+    --accent: #c0392b;      /* one quiet red, used almost never */
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font: 15px/1.5 var(--sans);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 1px dashed var(--ink); outline-offset: 4px; }
+
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: var(--bg); padding: 6px 10px; z-index: 10; }
+  .skip:focus { left: 8px; }
+
+  header.intro {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 3;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+    padding: 20px 24px;
+  }
+  .who { max-width: 34ch; }
+  .who h1 { font: 500 15px/1.3 var(--sans); margin: 0 0 4px; letter-spacing: .01em; }
+  .who p { margin: 0; color: var(--ink-dim); font-size: 13px; }
+  .osd { font: 12px/1.6 var(--mono); text-align: right; color: var(--ink); white-space: nowrap; }
+  .osd .rec { letter-spacing: .08em; }
+  .osd .date { color: var(--stamp); }
+
+  #stage { position: fixed; z-index: 1; }
+  #stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #stage nav a {
+    position: absolute; transform: translateY(-50%);
+    text-decoration: none; font-size: 14px; letter-spacing: .02em;
+    color: var(--ink-dim); padding: 6px 4px; white-space: nowrap;
+    transition: color .3s;
+  }
+  #stage nav a.r { transform: translate(-100%, -50%); text-align: right; }
+  #stage nav a:hover, #stage nav a:focus-visible, #stage nav a.on { color: var(--ink); }
+  #stage nav a::after { content: ""; display: inline-block; width: 4px; height: 4px; margin-left: 6px; border-radius: 50%; background: var(--accent); opacity: 0; vertical-align: middle; transition: opacity .3s; }
+  #stage nav a.r::after { display: none; }
+  #stage nav a.r::before { content: ""; display: inline-block; width: 4px; height: 4px; margin-right: 6px; border-radius: 50%; background: var(--accent); opacity: 0; vertical-align: middle; transition: opacity .3s; }
+  #stage nav a:hover::after, #stage nav a:focus-visible::after,
+  #stage nav a.r:hover::before, #stage nav a.r:focus-visible::before { opacity: 1; }
+  #stage nav small { position: absolute; top: 100%; left: 4px; font-size: 11px; color: var(--ink-dim); opacity: .0; transition: opacity .3s; }
+  #stage nav a.r small { left: auto; right: 4px; }
+  #stage nav a:hover small, #stage nav a:focus-visible small { opacity: .8; }
+
+  footer {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 3;
+    padding: 0 24px 18px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 16px;
+  }
+  .quick { font-size: 13px; color: var(--ink-dim); }
+  .quick a { text-decoration: none; border-bottom: 1px solid #ffffff22; }
+  .quick a:hover { color: var(--ink); border-color: var(--ink); }
+  .subtitle {
+    text-align: center; font: 17px/1.35 var(--sans); color: #fbf3dc;
+    text-shadow: 0 0 2px #000, 0 1px 3px #000;
+    min-height: 2.7em; max-width: 46ch; transition: opacity .8s;
+  }
+  .subtitle .src { display: block; font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
+  .right { text-align: right; font: 11px var(--mono); color: var(--ink-dim); }
+
+  /* film grain over everything */
+  .grain { position: fixed; inset: -50%; z-index: 4; pointer-events: none; opacity: .07;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    animation: grain 1s steps(6) infinite; }
+  @keyframes grain { 0%{transform:translate(0,0)} 20%{transform:translate(-3%,2%)} 40%{transform:translate(2%,-4%)} 60%{transform:translate(-4%,-1%)} 80%{transform:translate(3%,3%)} 100%{transform:translate(0,0)} }
+  .vignette { position: fixed; inset: 0; z-index: 2; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 52%, transparent 40%, #000a 100%); }
+
+  @media (max-width: 640px) {
+    header.intro { padding: 14px 16px; }
+    .who p { display: none; }
+    .osd { font-size: 10px; }
+    footer { grid-template-columns: 1fr; padding: 0 16px 14px; gap: 8px; text-align: center; }
+    .right { display: none; }
+    .subtitle { font-size: 14px; margin: 0 auto; }
+    #stage nav a { font-size: 13px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .grain { animation: none; } .subtitle { transition: none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#rooms">skip to sections</a>
+
+<header class="intro">
+  <div class="who">
+    <h1>selim saleh</h1>
+    <p>data &amp; ai engineer in munich, 2,700 km from home. i make films, take photographs, and write about time.</p>
+  </div>
+  <div class="osd" aria-hidden="true">
+    <div class="rec">▶ PLAY&nbsp;&nbsp;SP</div>
+    <div id="tc">0:00:00</div>
+    <div class="date">NOV.16 2026</div>
+  </div>
+</header>
+
+<main id="stage">
+  <canvas id="c" aria-hidden="true"></canvas>
+  <nav id="rooms" aria-label="sections">
+    <a href="#" data-g="laptop"  >work<small>projects · cv · paper</small></a>
+    <a href="#" data-g="camera"  >photographs</a>
+    <a href="#" data-g="notebook">writing</a>
+    <a href="#" data-g="ticket"  >films</a>
+    <a href="#" data-g="cup"     >me</a>
+    <a href="#" data-g="cassette">now<small>reading · watching · listening</small></a>
+  </nav>
+</main>
+
+<footer>
+  <div class="quick">in a hurry? <a href="#">projects</a> · <a href="#">cv (pdf)</a> · <a href="#">paper</a> · <a href="#">github</a></div>
+  <p class="subtitle" id="sub" aria-live="off"></p>
+  <div class="right">sketch v0 · not the real site</div>
+</footer>
+
+<div class="vignette"></div>
+<div class="grain"></div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const stage = document.getElementById('stage');
+  const cv = document.getElementById('c');
+  const ctx = cv.getContext('2d');
+  const links = [...document.querySelectorAll('#rooms a')];
+
+  // ---------- 1. draw each object once, in a 1000×1000 "stage" space ----------
+  const C = 500, R = 330;                 // table centre + radius
+  const off = document.createElement('canvas'); off.width = off.height = 1000;
+  const o = off.getContext('2d');
+
+  const at = (x, y, rot, fn) => { o.save(); o.translate(x, y); o.rotate(rot * Math.PI / 180); fn(); o.restore(); };
+  const fill = (a) => o.fillStyle = `rgba(255,255,255,${a})`;
+  const line = (a, w) => { o.strokeStyle = `rgba(255,255,255,${a})`; o.lineWidth = w; };
+  const rr = (x, y, w, h, r) => { o.beginPath(); o.roundRect(x, y, w, h, r); };
+
+  const shapes = {
+    table() {
+      o.beginPath(); o.arc(C, C, R, 0, 7);
+      const g = o.createRadialGradient(C, C - 40, 20, C, C, R);
+      g.addColorStop(0, 'rgba(255,255,255,.16)'); g.addColorStop(1, 'rgba(255,255,255,.03)');
+      o.fillStyle = g; o.fill();
+      line(1, 7); o.stroke();
+      o.beginPath(); o.arc(C, C, R - 16, 0, 7); line(.25, 2); o.stroke();
+    },
+    laptop() { at(515, 330, 5, () => {
+      rr(-125, -80, 250, 160, 10); fill(.22); o.fill(); line(1, 4); o.stroke();
+      for (let r = 0; r < 4; r++) for (let k = 0; k < 11; k++) { rr(-105 + k * 19, -62 + r * 19, 14, 14, 2); fill(.75); o.fill(); }
+      rr(-80, 18, 160, 12, 3); fill(.75); o.fill();               // space bar
+      rr(-40, 40, 80, 30, 4); line(.9, 3); o.stroke();            // trackpad
+    }); },
+    camera() { at(305, 470, -18, () => {
+      rr(-80, -45, 160, 90, 12); fill(.3); o.fill(); line(1, 4); o.stroke();
+      o.beginPath(); o.arc(0, 0, 38, 0, 7); fill(.15); o.fill(); line(1, 5); o.stroke();
+      o.beginPath(); o.arc(0, 0, 22, 0, 7); fill(.9); o.fill();
+      o.beginPath(); o.arc(0, 0, 9, 0, 7); o.fillStyle = '#000'; o.fill();
+      rr(45, -40, 22, 12, 2); fill(.9); o.fill();                 // viewfinder
+      rr(-70, -58, 30, 13, 3); fill(.8); o.fill();                // shutter
+    }); },
+    notebook() { at(375, 650, -10, () => {
+      rr(-75, -100, 150, 200, 4); fill(.18); o.fill(); line(1, 4); o.stroke();
+      for (let i = 0; i < 9; i++) { o.beginPath(); o.moveTo(-60, -70 + i * 19); o.lineTo(i === 8 ? 10 : 60 - (i % 3) * 14, -70 + i * 19); line(.7, 2); o.stroke(); }
+      o.beginPath(); o.moveTo(-75, -100); o.lineTo(-75, 100); line(1, 8); o.stroke();
+      at(105, 10, 8, () => { rr(-5, -95, 10, 190, 4); fill(.95); o.fill(); });  // pen
+    }); },
+    ticket() { at(560, 675, 16, () => {
+      o.beginPath(); o.moveTo(-90, -38); o.lineTo(90, -38); o.lineTo(90, -10); o.arc(90, 0, 10, -Math.PI/2, Math.PI/2, true);
+      o.lineTo(90, 38); o.lineTo(-90, 38); o.lineTo(-90, 10); o.arc(-90, 0, 10, Math.PI/2, -Math.PI/2, true); o.closePath();
+      fill(.25); o.fill(); line(1, 3); o.stroke();
+      for (let y = -32; y <= 32; y += 8) { o.beginPath(); o.arc(45, y, 2, 0, 7); fill(1); o.fill(); }  // perforation
+      for (let i = 0; i < 3; i++) { rr(-72, -20 + i * 15, 95 - i * 25, 6, 2); fill(.8); o.fill(); }
+      rr(58, -15, 22, 30, 2); fill(.6); o.fill();
+    }); },
+    cassette() { at(705, 680, -8, () => {
+      rr(-80, -52, 160, 104, 8); fill(.22); o.fill(); line(1, 4); o.stroke();
+      rr(-58, -36, 116, 44, 5); line(.8, 2); o.stroke();
+      for (const x of [-30, 30]) { o.beginPath(); o.arc(x, -14, 15, 0, 7); line(1, 4); o.stroke(); o.beginPath(); o.arc(x, -14, 5, 0, 7); fill(1); o.fill(); }
+      o.beginPath(); o.moveTo(-50, 52); o.lineTo(-38, 30); o.lineTo(38, 30); o.lineTo(50, 52); line(.8, 2); o.stroke();
+      rr(-50, 14, 70, 8, 2); fill(.7); o.fill();                  // handwritten label
+    }); },
+    cup() { at(715, 455, 0, () => {
+      o.beginPath(); o.arc(0, 0, 68, 0, 7); fill(.12); o.fill(); line(.9, 3); o.stroke();      // saucer
+      o.beginPath(); o.arc(0, 0, 44, 0, 7); fill(.35); o.fill(); line(1, 5); o.stroke();       // cup
+      o.beginPath(); o.arc(0, 0, 34, 0, 7); o.fillStyle = 'rgba(0,0,0,.85)'; o.fill();          // coffee
+      o.beginPath(); o.arc(-6, -6, 12, Math.PI, 1.6 * Math.PI); line(.7, 3); o.stroke();       // crema glint
+      rr(42, -9, 30, 18, 8); line(1, 5); o.stroke();                                           // handle
+      at(-20, 70, 30, () => { rr(-3, -38, 6, 76, 3); fill(.9); o.fill(); });                   // spoon
+    }); },
+  };
+
+  // ---------- 2. turn each drawing into points (stipple) ----------
+  const pts = [];          // [hx, hy, x, y, group, size, phase, delay]
+  const groups = Object.keys(shapes);
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  groups.forEach((g, gi) => {
+    o.clearRect(0, 0, 1000, 1000); shapes[g]();
+    const d = o.getImageData(0, 0, 1000, 1000).data;
+    const step = 2.8;
+    for (let y = 0; y < 1000; y += step) for (let x = 0; x < 1000; x += step) {
+      const jx = x + rnd(-1.6, 1.6), jy = y + rnd(-1.6, 1.6);
+      const i = ((jy | 0) * 1000 + (jx | 0)) * 4;
+      const al = d[i + 3] / 255;
+      if (d[i] > 30 && Math.random() < Math.pow(al, 1.7) * 0.95)
+        pts.push({ hx: jx, hy: jy, g: gi, s: rnd(.7, 1.35), ph: rnd(0, 6.28), dl: rnd(0, 1),
+                   x: rnd(0, 1000), y: rnd(0, 1000) });
+    }
+  });
+  // loose dust floating in the lamp light (not part of any object)
+  const dust = Array.from({ length: 140 }, () => ({ x: rnd(80, 920), y: rnd(80, 920), vx: rnd(-.06, .06), vy: rnd(-.12, -.02), s: rnd(.6, 1.6), ph: rnd(0, 6.28) }));
+
+  // label anchors: where each leader line leaves its object (stage coords)
+  const anchor = { laptop: [410, 300], camera: [235, 470], notebook: [300, 640], ticket: [490, 715], cup: [770, 430], cassette: [780, 690] };
+  const labelDesk = { laptop: [40, 175], camera: [40, 420], notebook: [40, 700], ticket: [40, 900], cup: [960, 330], cassette: [960, 830] };
+  const labelMob  = { laptop: [30, 70], camera: [30, 170], cup: [970, 120], notebook: [30, 1290], ticket: [30, 1390], cassette: [970, 1340] };
+  let labelPos = labelDesk, DY = 0, H = 1000;
+
+  // ---------- 3. layout ----------
+  let S = 0, ox = 0, oy = 0, dpr = 1;
+  function layout() {
+    const vw = innerWidth, vh = innerHeight, mobile = vw < 640;
+    H = mobile ? 1450 : 1000; DY = mobile ? 225 : 0; labelPos = mobile ? labelMob : labelDesk;
+    const avail = vh - (mobile ? 190 : 170);
+    S = Math.min(vw - (mobile ? 8 : 48), avail * 1000 / H);
+    const sh = S * H / 1000;
+    ox = (vw - S) / 2; oy = (mobile ? 58 : 70) + (avail - sh) / 2;
+    Object.assign(stage.style, { left: ox + 'px', top: oy + 'px', width: S + 'px', height: sh + 'px' });
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    cv.width = S * dpr; cv.height = sh * dpr;
+    links.forEach(a => {
+      const [x, y] = labelPos[a.dataset.g];
+      a.style.left = (x / 1000 * S) + 'px'; a.style.top = (y / 1000 * S) + 'px';
+      a.classList.toggle('r', x > 500);
+    });
+    if (reduce) draw(performance.now());
+  }
+
+  // ---------- 4. hover / focus brings one memory into focus ----------
+  let active = -1, focusAmt = new Float32Array(groups.length);
+  links.forEach(a => {
+    const gi = groups.indexOf(a.dataset.g);
+    const on = () => { active = gi; if (reduce) draw(performance.now()); };
+    const off = () => { if (active === gi) active = -1; if (reduce) draw(performance.now()); };
+    a.addEventListener('mouseenter', on); a.addEventListener('focus', on);
+    a.addEventListener('mouseleave', off); a.addEventListener('blur', off);
+    a.addEventListener('click', e => e.preventDefault());
+  });
+
+  // ---------- 5. render ----------
+  const t0 = performance.now();
+  function draw(now) {
+    const t = (now - t0) / 1000, k = S / 1000 * dpr;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.translate(0, DY * k);
+
+    // lamp pool + slow projector flicker
+    const flick = reduce ? 1 : 0.94 + 0.06 * Math.sin(t * 7.3) * Math.sin(t * 2.1);
+    const lamp = ctx.createRadialGradient(C * k, (C - 30) * k, 0, C * k, C * k, 560 * k);
+    lamp.addColorStop(0, `rgba(236,214,170,${.13 * flick})`); lamp.addColorStop(.55, 'rgba(236,214,170,.04)'); lamp.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = lamp; ctx.fillRect(0, -DY * k, cv.width, cv.height);
+
+    for (let g = 0; g < groups.length; g++) focusAmt[g] += ((active === g ? 1 : 0) - focusAmt[g]) * (reduce ? 1 : .08);
+    const anyActive = active >= 0;
+
+    // points
+    const intro = reduce ? 1 : Math.min(1, t / 2.8);
+    for (const p of pts) {
+      const f = focusAmt[p.g];
+      let e = reduce ? 1 : Math.min(1, Math.max(0, (intro * 1.6 - p.dl * .6)));
+      e = 1 - Math.pow(1 - e, 3);
+      const wob = (reduce ? 0 : 1.3) * (1 - f);
+      const hx = p.hx + Math.sin(t * .7 + p.ph) * wob, hy = p.hy + Math.cos(t * .5 + p.ph) * wob;
+      const x = p.x + (hx - p.x) * e, y = p.y + (hy - p.y) * e;
+      let a = (p.g === 0 ? .6 : .95) * (0.65 + 0.35 * Math.sin(t * 1.3 + p.ph * 3));
+      if (anyActive) a *= p.g === active ? 1.35 : (p.g === 0 ? .7 : .35);
+      a *= .25 + .75 * e;
+      ctx.fillStyle = `rgba(236,226,201,${Math.min(1, a).toFixed(3)})`;
+      const s = p.s * (1 + f * .25) * k * 1.45;
+      ctx.fillRect(x * k - s / 2, y * k - s / 2, s, s);
+    }
+
+    // dust motes
+    for (const d of dust) {
+      if (!reduce) { d.x += d.vx + Math.sin(t * .3 + d.ph) * .05; d.y += d.vy; if (d.y < 60) { d.y = 940; d.x = rnd(80, 920); } }
+      const dist = Math.hypot(d.x - C, d.y - C) / 560, a = Math.max(0, .5 - dist * .5) * (0.6 + 0.4 * Math.sin(t * 2 + d.ph));
+      ctx.fillStyle = `rgba(255,240,210,${a.toFixed(3)})`;
+      ctx.fillRect(d.x * k, d.y * k, d.s * k, d.s * k);
+    }
+
+    // leader lines drawn as dotted trails of light
+    links.forEach(a => {
+      const g = a.dataset.g, gi = groups.indexOf(g), f = focusAmt[gi];
+      const [ax, ay] = anchor[g];
+      const r = a.getBoundingClientRect(), sr = stage.getBoundingClientRect();
+      const ex = ((a.classList.contains('r') ? r.left - 4 : r.left + measure(a) + 8) - sr.left) / S * 1000;
+      const ey = labelPos[g][1] - DY;
+      const n = Math.max(6, Math.hypot(ex - ax, ey - ay) / 7 | 0);
+      for (let i = 0; i <= n; i++) {
+        const u = i / n; if (u > intro) break;
+        const x = ax + (ex - ax) * u, y = ay + (ey - ay) * u;
+        const al = (.22 + .55 * f) * (reduce ? 1 : .8 + .2 * Math.sin(t * 3 - u * 8));
+        ctx.fillStyle = `rgba(236,226,201,${al.toFixed(3)})`;
+        ctx.fillRect(x * k - .8 * k, y * k - .8 * k, 1.6 * k, 1.6 * k);
+      }
+    });
+    links.forEach(a => a.classList.toggle('on', focusAmt[groups.indexOf(a.dataset.g)] > .5));
+  }
+  // width of the visible label word only (not the hover hint)
+  const mctx = document.createElement('canvas').getContext('2d');
+  function measure(a) { mctx.font = getComputedStyle(a).font; return mctx.measureText(a.firstChild.textContent).width + 4; }
+  function loop(now) { draw(now); requestAnimationFrame(loop); }
+
+  // ---------- 6. camcorder timecode + subtitles ----------
+  const tc = document.getElementById('tc');
+  setInterval(() => { const s = (performance.now() - t0) / 1000 | 0; tc.textContent = `${s / 3600 | 0}:${String((s / 60 | 0) % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }, 500);
+
+  const lines = [
+    ['[the same piano keeps playing]', 'listening — LCD Soundsystem, “All My Friends”'],
+    ['“How long does tomorrow last?”', 'last watched — Eternity and a Day (1998)'],
+    ['nostalgia is the evidence submitted in the courtroom of existence.', 'from my writing — “Three Times Cinema Paradiso Found Me”'],
+    ['i was here. i loved. i was loved. i lived.', 'from my writing'],
+  ];
+  const sub = document.getElementById('sub'); let li = 0;
+  const show = () => { const [l, s] = lines[li++ % lines.length]; sub.style.opacity = 0;
+    setTimeout(() => { sub.innerHTML = ''; sub.append(l); const sp = document.createElement('span'); sp.className = 'src'; sp.textContent = s; sub.append(sp); sub.style.opacity = 1; }, reduce ? 0 : 700); };
+  show(); if (!reduce) setInterval(show, 7000);
+
+  addEventListener('resize', layout); layout();
+  if (!reduce) requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

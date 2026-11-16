@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en" data-palette="cyanotype">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>selim saleh — sketch v1</title>
+<meta name="description" content="Design sketch v1: work first, and a box of everything else on the table.">
+<style>
+  /* ---- palettes: every colour lives here ---- */
+  :root, [data-palette="cyanotype"] {
+    --bg: #12305a; --bg-deep: #0b2143;
+    --ink: #eef1ea; --ink-rgb: 238,241,234; --ink-dim: #a9bad0;
+    --stamp: #ffb15c; --accent: #ffcf6e; --rule: #ffffff26;
+    --grain: .09; --grain-invert: 0;
+  }
+  [data-palette="paper"] {
+    --bg: #ebe4d4; --bg-deep: #d9cfba;
+    --ink: #1c2540; --ink-rgb: 28,37,64; --ink-dim: #5f5a50;
+    --stamp: #c94a17; --accent: #b3261e; --rule: #1c254026;
+    --grain: .12; --grain-invert: 1;
+  }
+  [data-palette="komorebi"] {
+    --bg: #1d2a20; --bg-deep: #121b14;
+    --ink: #efe6c4; --ink-rgb: 239,230,196; --ink-dim: #a4a88c;
+    --stamp: #f0b443; --accent: #f0b443; --rule: #ffffff22;
+    --grain: .08; --grain-invert: 0;
+  }
+  :root {
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body {
+    margin: 0; min-height: 100vh; color: var(--ink);
+    background: radial-gradient(ellipse at 70% 45%, var(--bg) 0%, var(--bg) 35%, var(--bg-deep) 100%);
+    font: 15px/1.55 var(--sans); -webkit-font-smoothing: antialiased;
+    transition: background .6s, color .6s;
+  }
+  a, button { color: inherit; font: inherit; }
+  :focus-visible { outline: 1px dashed var(--ink); outline-offset: 4px; }
+  .skip { position: absolute; left: -999px; top: 8px; background: var(--ink); color: var(--bg); padding: 6px 10px; z-index: 10; }
+  .skip:focus { left: 8px; }
+
+  .osd { position: fixed; top: 18px; right: 22px; z-index: 5; font: 12px/1.6 var(--mono); text-align: right; white-space: nowrap; }
+  .osd .date { color: var(--stamp); }
+
+  .page { display: grid; grid-template-columns: minmax(320px, 440px) 1fr; gap: 24px; min-height: 100vh; padding: 0 24px 0 48px; }
+
+  /* ---- left: the work ---- */
+  .work { padding: 72px 0 40px; display: flex; flex-direction: column; gap: 28px; position: relative; z-index: 3; }
+  .work h1 { font: 500 26px/1.2 var(--sans); margin: 0; letter-spacing: -.01em; }
+  .work .line { margin: 10px 0 0; font-size: 17px; line-height: 1.45; }
+  .work .line em { font-style: normal; color: var(--ink-dim); }
+  .label { font: 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-dim); margin: 0 0 10px; }
+  .now { margin: 0; color: var(--ink-dim); font-size: 14px; }
+  .now b { color: var(--ink); font-weight: 500; }
+  ol.projects { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+  ol.projects li { border-bottom: 1px solid var(--rule); }
+  ol.projects a { display: grid; grid-template-columns: 1fr auto; gap: 2px 16px; padding: 11px 0; text-decoration: none; }
+  ol.projects .t { font-weight: 500; }
+  ol.projects .s { grid-column: 1 / -1; font-size: 13.5px; color: var(--ink-dim); }
+  ol.projects .m { font: 11px var(--mono); color: var(--ink-dim); align-self: center; }
+  ol.projects a:hover .t, ol.projects a:focus-visible .t { text-decoration: underline; text-underline-offset: 3px; }
+  .links { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; margin: 0; padding: 0; list-style: none; }
+  .links a { text-decoration: none; border-bottom: 1px solid var(--rule); }
+  .links a:hover { border-color: var(--ink); }
+  .links .primary a { border-bottom-color: var(--stamp); }
+
+  /* ---- right: the table ---- */
+  .scene { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0 24px; }
+  #stage { position: relative; }
+  #stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #stage .tag {
+    position: absolute; transform: translateY(-50%);
+    text-decoration: none; font-size: 14px; letter-spacing: .02em; color: var(--ink-dim);
+    padding: 6px 4px; white-space: nowrap; background: none; border: 0; cursor: pointer;
+    transition: color .3s, opacity .5s;
+  }
+  #stage .tag.r { transform: translate(-100%, -50%); text-align: right; }
+  #stage .tag:hover, #stage .tag:focus-visible, #stage .tag.on { color: var(--ink); }
+  #stage .tag small { position: absolute; top: 100%; left: 4px; font-size: 11px; opacity: 0; transition: opacity .3s; color: var(--ink-dim); }
+  #stage .tag.r small { left: auto; right: 4px; }
+  #stage .tag:hover small, #stage .tag:focus-visible small, #stage .tag.box small { opacity: .85; }
+  #stage .tag.box { color: var(--ink); }
+  #stage .tag.box::before { content: "◇ "; color: var(--stamp); }
+  #stage .tag.box[aria-expanded="true"]::before { content: "◆ "; }
+  #stage .hobby { opacity: 0; visibility: hidden; }
+  #stage.open .hobby { opacity: 1; visibility: visible; transition-delay: .5s; }
+
+  .subtitle { text-align: center; font: 16px/1.35 var(--sans); color: var(--ink); min-height: 2.8em; max-width: 48ch; margin: 10px 0 0; transition: opacity .8s; }
+  .subtitle .src { display: block; font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
+
+  .palette { position: fixed; right: 22px; bottom: 16px; z-index: 6; font: 11px var(--mono); color: var(--ink-dim); display: flex; gap: 10px; align-items: center; }
+  .palette button { background: none; border: 0; padding: 2px 0; cursor: pointer; color: var(--ink-dim); border-bottom: 1px solid transparent; }
+  .palette button[aria-pressed="true"] { color: var(--ink); border-bottom-color: var(--stamp); }
+
+  .grain { position: fixed; inset: -50%; z-index: 7; pointer-events: none; opacity: var(--grain);
+    filter: invert(var(--grain-invert));
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    animation: grain 1s steps(6) infinite; }
+  @keyframes grain { 0%{transform:translate(0,0)} 25%{transform:translate(-3%,2%)} 50%{transform:translate(2%,-4%)} 75%{transform:translate(-4%,-1%)} 100%{transform:translate(0,0)} }
+
+  @media (max-width: 900px) {
+    .page { grid-template-columns: 1fr; padding: 0 16px; gap: 0; }
+    .work { padding: 64px 0 8px; gap: 22px; }
+    .scene { position: relative; height: auto; padding: 8px 0 24px; order: 2; }
+    .work.rest { order: 3; padding-top: 0; }
+    .osd { position: absolute; top: 14px; right: 16px; font-size: 10px; }
+    .palette { position: static; justify-content: center; padding: 0 0 24px; order: 4; }
+    #stage .tag { font-size: 13px; }
+  }
+  @media (min-width: 901px) { .work.rest { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .grain { animation: none; } * { transition: none !important; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#selected">skip to work</a>
+
+<div class="osd" aria-hidden="true">
+  <div>▶ PLAY&nbsp;&nbsp;SP</div>
+  <div id="tc">0:00:00</div>
+  <div class="date">NOV.16 2026</div>
+</div>
+
+<div class="page">
+  <section class="work" aria-label="who and what">
+    <header>
+      <h1>selim saleh</h1>
+      <p class="line">i build ai systems that show their evidence. <em>after hours, i collect a different kind.</em></p>
+    </header>
+
+    <p class="now"><b>now</b> — m.sc. data engineering &amp; analytics at TUM (thesis: teaching an llm egyptian arabic) · data engineering at IONITY · building morehere.</p>
+
+    <div id="selected" class="desk-only-list">
+      <p class="label">selected work</p>
+      <ol class="projects">
+        <li><a href="#"><span class="t">procure-agent-lite</span><span class="m">shipped · 2026</span><span class="s">messy procurement inbox in, human-approved purchase order out, every number traced to its source.</span></a></li>
+        <li><a href="#"><span class="t">re-ranking through an attribution lens</span><span class="m">paper · ASAIL 2026</span><span class="s">making legal-qa answers cite the evidence they actually used.</span></a></li>
+        <li><a href="#"><span class="t">ladewüste</span><span class="m">in progress · 2026</span><span class="s">where germany runs out of fast chargers, a playful 3d map of charging deserts.</span></a></li>
+        <li><a href="#"><span class="t">morehere.</span><span class="m">in progress · 2026</span><span class="s">a third-places scout for newcomers to munich.</span></a></li>
+      </ol>
+    </div>
+
+    <ul class="links" aria-label="links">
+      <li class="primary"><a href="#">cv (pdf)</a></li>
+      <li><a href="#">all projects</a></li>
+      <li><a href="#">github</a></li>
+      <li><a href="#">linkedin</a></li>
+      <li><a href="#" id="mail" data-u="selimmoftahsaleh" data-d="gmail.com">email</a></li>
+    </ul>
+  </section>
+
+  <section class="scene" aria-label="the table">
+    <div id="stage">
+      <canvas id="c" aria-hidden="true"></canvas>
+      <a class="tag" href="#" data-g="laptop">projects</a>
+      <a class="tag" href="#" data-g="paper">research<small>the asail 2026 paper · thesis</small></a>
+      <a class="tag" href="#" data-g="cup">about me</a>
+      <button class="tag box" type="button" data-g="lid" aria-expanded="false" aria-controls="after-hours">after hours<small>films · photographs · writing · now</small></button>
+      <div id="after-hours">
+        <a class="tag hobby" href="#" data-g="camera">photographs</a>
+        <a class="tag hobby" href="#" data-g="ticket">films</a>
+        <a class="tag hobby" href="#" data-g="notebook">writing</a>
+        <a class="tag hobby" href="#" data-g="cassette">now<small>reading · watching · listening</small></a>
+      </div>
+    </div>
+    <p class="subtitle" id="sub"></p>
+  </section>
+
+  <div class="palette" role="group" aria-label="palette (sketch only)">
+    <span>palette:</span>
+    <button type="button" data-p="cyanotype">cyanotype</button>
+    <button type="button" data-p="paper">paper</button>
+    <button type="button" data-p="komorebi">komorebi</button>
+  </div>
+</div>
+<div class="grain"></div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const stage = document.getElementById('stage');
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const tags = [...stage.querySelectorAll('.tag')];
+  const boxBtn = stage.querySelector('.box');
+
+  // ---------- mail link assembled in JS (no plain-text address in the HTML) ----------
+  const m = document.getElementById('mail'); m.href = 'mailto:' + m.dataset.u + '@' + m.dataset.d;
+
+  // ---------- palette switcher (sketch only) ----------
+  let INK = '238,241,234';
+  const setPal = p => {
+    document.documentElement.dataset.palette = p;
+    document.querySelectorAll('.palette button').forEach(b => b.setAttribute('aria-pressed', b.dataset.p === p));
+    INK = getComputedStyle(document.documentElement).getPropertyValue('--ink-rgb').trim();
+    try { localStorage.setItem('pal', p); } catch (e) {}
+    if (reduce) draw(performance.now());
+  };
+  document.querySelectorAll('.palette button').forEach(b => b.onclick = () => setPal(b.dataset.p));
+
+  // ---------- 1. the objects, drawn once in a 1000×1000 stage ----------
+  const C = 500, R = 420;
+  const off = document.createElement('canvas'); off.width = off.height = 1000;
+  const o = off.getContext('2d');
+  const at = (x, y, rot, fn) => { o.save(); o.translate(x, y); o.rotate(rot * Math.PI / 180); fn(); o.restore(); };
+  const fill = a => o.fillStyle = `rgba(255,255,255,${a})`;
+  const line = (a, w) => { o.strokeStyle = `rgba(255,255,255,${a})`; o.lineWidth = w; };
+  const rr = (x, y, w, h, r) => { o.beginPath(); o.roundRect(x, y, w, h, r); };
+  const BOX = { x: 590, y: 610, w: 210, h: 140, rot: -6 };
+
+  const shapes = {
+    table() {
+      o.beginPath(); o.arc(C, C, R, 0, 7);
+      const g = o.createRadialGradient(C, C - 40, 20, C, C, R);
+      g.addColorStop(0, 'rgba(255,255,255,.18)'); g.addColorStop(1, 'rgba(255,255,255,.04)');
+      o.fillStyle = g; o.fill(); line(1, 7); o.stroke();
+      o.beginPath(); o.arc(C, C, R - 16, 0, 7); line(.3, 2); o.stroke();
+    },
+    laptop() { at(395, 320, -4, () => {
+      rr(-125, -120, 250, 95, 8); fill(.2); o.fill(); line(1, 4); o.stroke();          // screen (folded back)
+      for (let i = 0; i < 5; i++) { rr(-105 + (i % 2) * 18, -102 + i * 15, 120 - i * 14 + (i % 3) * 30, 6, 2); fill(.75); o.fill(); }
+      rr(-125, -20, 250, 150, 8); fill(.18); o.fill(); line(1, 4); o.stroke();          // base
+      for (let r = 0; r < 4; r++) for (let k = 0; k < 11; k++) { rr(-105 + k * 19, -4 + r * 19, 14, 14, 2); fill(.8); o.fill(); }
+      rr(-80, 74, 160, 10, 3); fill(.8); o.fill();
+      rr(-40, 92, 80, 28, 4); line(.9, 3); o.stroke();
+    }); },
+    paper() { at(690, 330, 8, () => {
+      rr(-70, -92, 150, 195, 2); fill(.1); o.fill(); line(.6, 3); o.stroke();            // sheet underneath
+      rr(-80, -100, 150, 195, 2); fill(.2); o.fill(); line(1, 4); o.stroke();            // top sheet
+      rr(-62, -80, 90, 8, 2); fill(1); o.fill();                                         // title
+      for (let i = 0; i < 4; i++) { rr(-62, -60 + i * 12, 114 - (i === 3 ? 40 : 0), 4, 2); fill(.6); o.fill(); }
+      const bars = [22, 38, 30, 52, 64];                                                // a little figure
+      bars.forEach((h, i) => { rr(-56 + i * 22, 50 - h, 14, h, 1); fill(.85); o.fill(); });
+      o.beginPath(); o.moveTo(-62, 52); o.lineTo(54, 52); line(.8, 2); o.stroke();
+      for (let i = 0; i < 2; i++) { rr(-62, 64 + i * 12, 114, 4, 2); fill(.6); o.fill(); }
+      o.beginPath(); o.moveTo(-74, -86); o.lineTo(-58, -94); line(1, 4); o.stroke();     // staple
+    }); },
+    cup() { at(300, 560, 0, () => {
+      o.beginPath(); o.arc(0, 0, 62, 0, 7); fill(.12); o.fill(); line(.9, 3); o.stroke();
+      o.beginPath(); o.arc(0, 0, 40, 0, 7); fill(.35); o.fill(); line(1, 5); o.stroke();
+      o.beginPath(); o.arc(0, 0, 31, 0, 7); o.fillStyle = 'rgba(0,0,0,.9)'; o.fill();
+      o.beginPath(); o.arc(-6, -6, 11, Math.PI, 1.6 * Math.PI); line(.7, 3); o.stroke();
+      rr(38, -8, 28, 16, 8); line(1, 5); o.stroke();
+    }); },
+    box() { at(BOX.x, BOX.y, BOX.rot, () => {                                         // tin base, seen when open
+      rr(-BOX.w / 2, -BOX.h / 2, BOX.w, BOX.h, 10); fill(.12); o.fill(); line(1, 4); o.stroke();
+      rr(-BOX.w / 2 + 12, -BOX.h / 2 + 12, BOX.w - 24, BOX.h - 24, 6); line(.5, 2); o.stroke();
+    }); },
+    lid() { at(BOX.x, BOX.y, BOX.rot, () => {                                         // lid with a strip of tape
+      rr(-BOX.w / 2 - 6, -BOX.h / 2 - 6, BOX.w + 12, BOX.h + 12, 12); fill(.3); o.fill(); line(1, 5); o.stroke();
+      rr(-BOX.w / 2 + 10, -BOX.h / 2 + 10, BOX.w - 20, BOX.h - 20, 8); line(.45, 2); o.stroke();
+      at(0, 0, -3, () => { rr(-70, -16, 140, 32, 2); fill(.75); o.fill(); });        // masking tape
+      at(0, 0, -3, () => { for (let i = 0; i < 3; i++) { rr(-56 + i * 40, -4, 30, 6, 2); o.fillStyle = 'rgba(0,0,0,1)'; o.fill(); } });
+    }); },
+    camera() { at(330, 760, -14, () => {
+      rr(-70, -40, 140, 80, 10); fill(.3); o.fill(); line(1, 4); o.stroke();
+      o.beginPath(); o.arc(0, 0, 33, 0, 7); fill(.15); o.fill(); line(1, 5); o.stroke();
+      o.beginPath(); o.arc(0, 0, 19, 0, 7); fill(.9); o.fill();
+      o.beginPath(); o.arc(0, 0, 8, 0, 7); o.fillStyle = '#000'; o.fill();
+      rr(38, -34, 20, 11, 2); fill(.9); o.fill(); rr(-60, -52, 26, 12, 3); fill(.8); o.fill();
+    }); },
+    ticket() { at(545, 830, 9, () => {
+      o.beginPath(); o.moveTo(-80, -32); o.lineTo(80, -32); o.lineTo(80, -9); o.arc(80, 0, 9, -Math.PI / 2, Math.PI / 2, true);
+      o.lineTo(80, 32); o.lineTo(-80, 32); o.lineTo(-80, 9); o.arc(-80, 0, 9, Math.PI / 2, -Math.PI / 2, true); o.closePath();
+      fill(.25); o.fill(); line(1, 3); o.stroke();
+      for (let y = -26; y <= 26; y += 7) { o.beginPath(); o.arc(40, y, 2, 0, 7); fill(1); o.fill(); }
+      for (let i = 0; i < 3; i++) { rr(-64, -18 + i * 13, 85 - i * 22, 5, 2); fill(.8); o.fill(); }
+    }); },
+    notebook() { at(770, 700, 12, () => {
+      rr(-50, -66, 100, 132, 4); fill(.18); o.fill(); line(1, 4); o.stroke();
+      for (let i = 0; i < 6; i++) { o.beginPath(); o.moveTo(-38, -44 + i * 17); o.lineTo(38 - (i % 3) * 12, -44 + i * 17); line(.7, 2); o.stroke(); }
+      o.beginPath(); o.moveTo(-50, -66); o.lineTo(-50, 66); line(1, 7); o.stroke();
+    }); },
+    cassette() { at(805, 515, -10, () => {
+      rr(-62, -40, 124, 80, 7); fill(.22); o.fill(); line(1, 4); o.stroke();
+      rr(-44, -28, 88, 34, 4); line(.8, 2); o.stroke();
+      for (const x of [-23, 23]) { o.beginPath(); o.arc(x, -11, 11, 0, 7); line(1, 3); o.stroke(); o.beginPath(); o.arc(x, -11, 4, 0, 7); fill(1); o.fill(); }
+      rr(-38, 12, 54, 6, 2); fill(.7); o.fill();
+    }); },
+  };
+  const HOBBY = ['camera', 'ticket', 'notebook', 'cassette'];
+
+  // ---------- 2. stipple: each point has a "closed" home and an "open" home ----------
+  const groups = Object.keys(shapes), pts = [];
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const rotAbout = (x, y, cx, cy, deg) => { const r = deg * Math.PI / 180, c = Math.cos(r), s = Math.sin(r); return [cx + (x - cx) * c - (y - cy) * s, cy + (x - cx) * s + (y - cy) * c]; };
+  groups.forEach((g, gi) => {
+    o.clearRect(0, 0, 1000, 1000); shapes[g]();
+    const d = o.getImageData(0, 0, 1000, 1000).data, step = 2.8;
+    for (let y = 0; y < 1000; y += step) for (let x = 0; x < 1000; x += step) {
+      const jx = x + rnd(-1.5, 1.5), jy = y + rnd(-1.5, 1.5);
+      if (jx < 0 || jy < 0 || jx >= 1000 || jy >= 1000) continue;
+      const i = ((jy | 0) * 1000 + (jx | 0)) * 4, al = d[i + 3] / 255;
+      if (d[i] < 30 || Math.random() > Math.pow(al, 1.7) * .95) continue;
+      let cx = jx, cy = jy, hx = jx, hy = jy, hid = 0;
+      if (g === 'lid') { [hx, hy] = rotAbout(jx, jy, BOX.x, BOX.y, -8); hx = BOX.x + (hx - BOX.x) * 1.35; hy = BOX.y + (hy - BOX.y) * 1.35 - 30; }   // lid lifts toward you and fades
+      if (HOBBY.includes(g)) { cx = BOX.x + rnd(-BOX.w / 2.6, BOX.w / 2.6); cy = BOX.y + rnd(-BOX.h / 2.6, BOX.h / 2.6); hid = 1; }
+      pts.push({ cx, cy, hx, hy, hid, g: gi, s: rnd(.7, 1.35), ph: rnd(0, 6.28), dl: rnd(0, 1), x: rnd(0, 1000), y: rnd(0, 1000) });
+    }
+  });
+  const dust = Array.from({ length: 120 }, () => ({ x: rnd(80, 920), y: rnd(80, 920), vy: rnd(-.12, -.02), s: rnd(.6, 1.6), ph: rnd(0, 6.28) }));
+
+  // where leader lines leave each object, and where each label sits: [x, y]
+  const anchor = { laptop: [300, 250], paper: [760, 250], cup: [240, 560], lid: [700, 640], camera: [270, 770], ticket: [470, 850], notebook: [820, 720], cassette: [860, 500] };
+  const DESK = { laptop: [30, 110], paper: [970, 110], cup: [30, 520], lid: [970, 930], camera: [30, 860], ticket: [30, 975], notebook: [970, 760], cassette: [970, 420] };
+  const MOB  = { laptop: [20, 60], paper: [980, 60], cup: [20, 150], cassette: [980, 150], lid: [980, 1330], camera: [20, 1270], ticket: [20, 1360], notebook: [980, 1250] };
+  let LAB = DESK, DY = 0, H = 1000, S = 0, dpr = 1;
+
+  function layout() {
+    const mobile = innerWidth <= 900;
+    H = mobile ? 1450 : 1000; DY = mobile ? 225 : 0; LAB = mobile ? MOB : DESK;
+    const scene = stage.parentElement.getBoundingClientRect();
+    S = mobile ? Math.min(innerWidth - 24, 560) : Math.min(scene.width - 220, innerHeight - 170, 760);
+    const sh = S * H / 1000;
+    stage.style.width = S + 'px'; stage.style.height = sh + 'px';
+    dpr = Math.min(devicePixelRatio || 1, 2); cv.width = S * dpr; cv.height = sh * dpr;
+    tags.forEach(a => { const [x, y] = LAB[a.dataset.g]; a.style.left = x / 1000 * S + 'px'; a.style.top = y / 1000 * S + 'px'; a.classList.toggle('r', x > 500); });
+    if (reduce) draw(performance.now());
+  }
+
+  // ---------- 3. interaction ----------
+  let active = -1, open = 0, openT = 0;
+  const focusAmt = new Float32Array(groups.length);
+  tags.forEach(a => {
+    const gi = groups.indexOf(a.dataset.g);
+    const on = () => { active = gi; if (reduce) draw(performance.now()); };
+    const offf = () => { if (active === gi) active = -1; if (reduce) draw(performance.now()); };
+    a.addEventListener('mouseenter', on); a.addEventListener('focus', on);
+    a.addEventListener('mouseleave', offf); a.addEventListener('blur', offf);
+    if (a.tagName === 'A') a.addEventListener('click', e => e.preventDefault());
+  });
+  boxBtn.addEventListener('click', () => {
+    open = open ? 0 : 1;
+    boxBtn.setAttribute('aria-expanded', !!open);
+    stage.classList.toggle('open', !!open);
+    if (reduce) { openT = open; draw(performance.now()); }
+  });
+
+  // ---------- 4. render ----------
+  const t0 = performance.now();
+  const ease = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+  const mctx = document.createElement('canvas').getContext('2d');
+  const measure = a => { mctx.font = getComputedStyle(a).font; return mctx.measureText(a.firstChild.textContent).width + (a.classList.contains('box') ? 22 : 4); };
+
+  function draw(now) {
+    const t = (now - t0) / 1000, k = S / 1000 * dpr;
+    if (!reduce) openT += (open - openT) * .045;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height); ctx.translate(0, DY * k);
+
+    const flick = reduce ? 1 : .94 + .06 * Math.sin(t * 7.3) * Math.sin(t * 2.1);
+    const lamp = ctx.createRadialGradient(C * k, (C - 30) * k, 0, C * k, C * k, 600 * k);
+    lamp.addColorStop(0, `rgba(${INK},${.10 * flick})`); lamp.addColorStop(.6, `rgba(${INK},.03)`); lamp.addColorStop(1, `rgba(${INK},0)`);
+    ctx.fillStyle = lamp; ctx.fillRect(0, -DY * k, cv.width, cv.height);
+
+    for (let g = 0; g < groups.length; g++) focusAmt[g] += ((active === g ? 1 : 0) - focusAmt[g]) * (reduce ? 1 : .08);
+    const any = active >= 0, intro = reduce ? 1 : Math.min(1, t / 2.6);
+    const boxG = groups.indexOf('lid');
+
+    for (const p of pts) {
+      const f = focusAmt[p.g];
+      let e = reduce ? 1 : Math.min(1, Math.max(0, intro * 1.6 - p.dl * .6)); e = 1 - Math.pow(1 - e, 3);
+      const u = ease(Math.min(1, Math.max(0, openT * 1.4 - p.dl * .4)));    // staggered open
+      const bx = p.cx + (p.hx - p.cx) * u, by = p.cy + (p.hy - p.cy) * u;
+      const wob = (reduce ? 0 : 1.2) * (1 - f);
+      const hx = bx + Math.sin(t * .7 + p.ph) * wob, hy = by + Math.cos(t * .5 + p.ph) * wob;
+      const x = p.x + (hx - p.x) * e, y = p.y + (hy - p.y) * e;
+      let a = (p.g === 0 ? .6 : .95) * (.65 + .35 * Math.sin(t * 1.3 + p.ph * 3));
+      if (p.hid) a *= Math.min(1, u * 1.5);                                   // hobbies hidden in the box
+      if (p.g === boxG) a *= 1 - .92 * u;                                     // lifted lid fades
+      const inFocus = p.g === active || (active === boxG && p.hid);
+      if (any) a *= inFocus ? 1.35 : (p.g === 0 ? .7 : .35);
+      a *= .25 + .75 * e;
+      if (a < .01) continue;
+      ctx.fillStyle = `rgba(${INK},${Math.min(1, a).toFixed(3)})`;
+      const s = p.s * (1 + f * .25) * k * 1.45;
+      ctx.fillRect(x * k - s / 2, y * k - s / 2, s, s);
+    }
+    for (const d of dust) {
+      if (!reduce) { d.x += Math.sin(t * .3 + d.ph) * .05; d.y += d.vy; if (d.y < 60) { d.y = 940; d.x = rnd(80, 920); } }
+      const a = Math.max(0, .5 - Math.hypot(d.x - C, d.y - C) / 1100) * (.6 + .4 * Math.sin(t * 2 + d.ph));
+      ctx.fillStyle = `rgba(${INK},${a.toFixed(3)})`; ctx.fillRect(d.x * k, d.y * k, d.s * k, d.s * k);
+    }
+    const sr = stage.getBoundingClientRect();
+    tags.forEach(a => {
+      const g = a.dataset.g, gi = groups.indexOf(g), f = focusAmt[gi];
+      const vis = a.classList.contains('hobby') ? Math.max(0, openT * 2 - 1) : 1;
+      if (vis <= 0) return;
+      const [ax0, ay0] = anchor[g];
+      const ax = ax0, ay = ay0;
+      const r = a.getBoundingClientRect();
+      const ex = ((a.classList.contains('r') ? r.left - 4 : r.left + measure(a) + 8) - sr.left) / S * 1000, ey = LAB[g][1] - DY;
+      const n = Math.max(6, Math.hypot(ex - ax, ey - ay) / 7 | 0);
+      for (let i = 0; i <= n; i++) {
+        const u = i / n; if (u > intro) break;
+        const al = (.25 + .55 * f) * vis * (reduce ? 1 : .8 + .2 * Math.sin(t * 3 - u * 8));
+        ctx.fillStyle = `rgba(${INK},${al.toFixed(3)})`;
+        ctx.fillRect((ax + (ex - ax) * u) * k - .8 * k, (ay + (ey - ay) * u) * k - .8 * k, 1.6 * k, 1.6 * k);
+      }
+      a.classList.toggle('on', f > .5);
+    });
+  }
+  const loop = now => { draw(now); requestAnimationFrame(loop); };
+
+  // ---------- 5. camcorder timecode + subtitles ----------
+  const tc = document.getElementById('tc');
+  setInterval(() => { const s = (performance.now() - t0) / 1000 | 0; tc.textContent = `${s / 3600 | 0}:${String((s / 60 | 0) % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }, 500);
+  const lines = [
+    ['[the same piano keeps playing]', 'listening — LCD Soundsystem, “All My Friends”'],
+    ['“How long does tomorrow last?”', 'last watched — Eternity and a Day (1998)'],
+    ['nostalgia is the evidence submitted in the courtroom of existence.', 'from my writing'],
+  ];
+  const sub = document.getElementById('sub'); let li = 0;
+  const show = () => { const [l, s] = lines[li++ % lines.length]; sub.style.opacity = 0;
+    setTimeout(() => { sub.textContent = l; const sp = document.createElement('span'); sp.className = 'src'; sp.textContent = s; sub.append(sp); sub.style.opacity = 1; }, reduce ? 0 : 700); };
+  show(); if (!reduce) setInterval(show, 7000);
+
+  let saved = 'cyanotype'; try { saved = localStorage.getItem('pal') || saved; } catch (e) {}
+  setPal(saved);
+  addEventListener('resize', layout); layout();
+  if (!reduce) requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
