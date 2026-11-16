@@ -48,6 +48,7 @@ I (Selim) will describe the look and feel in `DESIGN.md`. **Do not choose a visu
 4. **Content-first:** adding a photo series, film, essay or "now" update must be a single file edit + push. Document how in `README.md`.
 5. **Honest copy:** project pages state what I built myself and what was AI-assisted where relevant; no inflated claims.
 6. Ask before adding dependencies; keep the codebase small enough that I can explain all of it.
+7. **Git:** no AI attribution anywhere. No `Co-Authored-By` lines, no "generated with" notes, and no assistant or session links in commit messages, PR titles, PR descriptions or merge commits. Commits are authored as Selim only.
 
 ## Milestones (commit after each)
 
