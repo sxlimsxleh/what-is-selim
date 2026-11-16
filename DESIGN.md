@@ -1,11 +1,11 @@
 # Design brief — Selim Saleh
 
-_Draft v2, 16 Nov 2026, written with Claude from Selim's answers, his writing, and the natochi.cv reference. Items marked **OPEN** still need Selim's call._
+_Draft v3, 16 Nov 2026, written with Claude from Selim's answers, his writing, and the natochi.cv reference. Items marked **OPEN** still need Selim's call._
 
 ## 1. Feeling
 - **Three words:** nostalgic, quiet, hopeful. (Melancholy that still faces forward: "nostalgia is the evidence submitted in the courtroom of existence.")
-- **After 10 seconds a visitor should remember:** a café table at night, drawn in points of light, and that this person is both an engineer and someone who makes films, takes photographs and writes about time.
-- **Engineer vs artist:** work-heavy. The home page leads with the work (one-liner, now, selected projects, CV); the artistic side is one object, a closed box on the table called **after hours**. Opening it reveals films, photographs, writing and now, and leads to a dedicated after-hours page.
+- **After 10 seconds a visitor should remember:** a café table at night drawn in points of light, which then falls apart and becomes the work, chapter by chapter.
+- **Engineer vs artist:** both, in one journey. The table is the calm entrance; scrolling down the rabbit hole goes through the career and the work (most of the depth), and the artistic side lives in one place, **after hours**, which opens into its own pages.
 - **The thread between both sides: evidence.** The work is about AI that shows its sources (grounded extraction, citation-faithful legal QA, data-quality checks); the writing is about nostalgia as evidence ("I was here. I loved. I was loved. I lived.").
 
 ## 2. Inspiration
@@ -16,22 +16,29 @@ _Draft v2, 16 Nov 2026, written with Claude from Selim's answers, his writing, a
 - **Never:** template portfolio look, gradients-and-glass "tech" style, stock hero photos, skill bars, cursor gimmicks, auto-playing sound, copying anyone's signature visual (natochi's tree, Lynch's curtains, Ghibli imagery).
 
 ## 3. Look
-- **Concept: "the table."** Seen from above: a round café table under a lamp, drawn in points of light (dust in a projector beam / a constellation). Work objects lie on it: laptop → projects, a stapled paper with a small figure → research, coffee cup → about. Plus a taped-shut tin box → **after hours**. Click it: the lid lifts toward you and fades, and a camera (photographs), film ticket (films), notebook (writing) and cassette (now) spill out with their labels. Hovering or focusing an object pulls its points into focus while the rest dim. On first load the dust gathers into the table.
-- **Home layout:** desktop is two columns, work text on the left, the table on the right (sticky). Mobile shows the work text first, then the table.
-- **Colour (OPEN, choose in the sketch's palette switcher):** v1 moved away from the dark charcoal look of the reference. Three candidates, all tokens in one theme file:
-  - **cyanotype:** Prussian blue `#12305a`, paper-white ink `#eef1ea`, warm stamp `#ffb15c`. The blueprint (engineer) meets the photographic print (artist).
-  - **paper:** warm paper `#ebe4d4`, blue-black ink `#1c2540`, stamp `#c94a17`. A light theme, like a printed page.
-  - **komorebi:** deep green `#1d2a20`, sunlit cream `#efe6c4`, amber `#f0b443`. Perfect Days light through leaves.
-  - Option: cyanotype as default with paper as its light-mode twin.
-- **Typography:** grotesk sans for the interface and labels; a book serif for essays (writing pages read like a printed page); mono for the camcorder overlay (timecode, dates, metadata). **OPEN:** exact typefaces. Proposal: Inter or Geist for sans, Newsreader or Source Serif for serif, JetBrains Mono for mono, all self-hosted, with no font CDN.
-- **Layout:** the home page is one full-screen image, the inner pages are calm one-column text, and projects use a simple list (not a card grid).
-- **Motion:** subtle. Dust drifts, the lamp flickers slightly like a projector, points gather on load, and subtitles fade. All of it switches off with `prefers-reduced-motion`.
-- **Texture:** fine film grain over everything and a soft vignette.
+- **Concept: "the table, then the rabbit hole."** The home page opens on a café table at night, centred, drawn in points of light (v0 look). Its objects are shortcuts: laptop → projects, stapled paper → research, coffee cup → about, and a taped tin box → **after hours** (click to open: camera, film ticket, notebook and cassette spill out). Scrolling takes you down the rabbit hole: the same points dissolve and re-form into each chapter, with real HTML text beside them.
+- **Chapters (depth 00–08):**
+  - 00 the table
+  - 01 hello: the points spell *selim saleh* + سليم صالح
+  - 02 2,700 km: a dot-matrix map, a traveller crossing from Cairo to Munich, coordinates in mono
+  - 03 ionity: a dataset grid with a validation scan line; checks light up (schema, nulls, types, …)
+  - 04 procure-agent-lite: the pipeline (inbox → extract → ground → policy → approve → sap); documents flow and wait for the human
+  - 05 the paper: passages and an answer; attribution threads and a re-ranking that reorders
+  - 06 ladewüste: Germany as hexes; chargers drop and charging deserts shrink
+  - 07 after hours: a film strip in a projector beam; links to films, photographs, writing, now
+  - 08 back to the table: contact
+- **What it flexes:** the technical side is the scenes themselves (a hand-written particle system, data-driven visuals of each real project); taste is the restraint, the palette, the type and the references.
+- **Influences:** natochi.cv (one drawn image as the home page), logartis.info (a scroll journey through one world), wodniack.dev (technical HUD details, kinetic type, chapter structure). Principles only; no borrowed visuals.
+- **Colour:** the v0 warm dark room: background `#100e11`, tungsten ink `#ece2c9`, dim `#9a9080`, camcorder stamp orange `#ff8f3f` (dates, timecode, highlights in the scenes), one quiet red `#c0392b`. Tokens in one theme file.
+- **HUD:** name top-left; camcorder overlay top-right (▶ PLAY · timecode · date); a depth meter on the left that doubles as chapter navigation; "in a hurry? cv · projects · paper · github · email" always visible bottom-left.
+- **Typography:** grotesk sans for the interface, a book serif for essays, mono for HUD and data labels. **OPEN:** exact typefaces (proposal: Inter or Geist, Newsreader, JetBrains Mono; self-hosted).
+- **Motion:** scroll-scrubbed morphs, dust drift, slight projector flicker. With `prefers-reduced-motion`, scenes switch with no flight and overlays are still.
+- **Texture:** film grain and a soft vignette.
 
 ## 4. Home page
-- **Identity line (OPEN, draft):** "i build ai systems that show their evidence. after hours, i collect a different kind."
-- **Above the fold:** name, one-liner, a "now" line (TUM thesis · IONITY · morehere.), selected work (procure-agent-lite, the ASAIL 2026 paper, Ladewüste, morehere.), then cv (pdf) · all projects · github · linkedin · email. The table sits beside it. The camcorder overlay (▶ PLAY · timecode · date) is top right.
-- **Signature element:** a subtitle line at the bottom of the screen, like a film's subtitles, that rotates between three things: the song Selim is listening to, the last film he watched, and a line from what he's reading or writing. It's fed from the `now` file. On a later pass, one of Selim's own photographs develops on the table and changes on each visit.
+- **Identity line (OPEN, draft):** "i build ai systems that show their evidence." (shown in chapter 01)
+- **For recruiters:** everything in one click from any depth: the "in a hurry?" bar and the depth meter (03–06 are the work).
+- **Signature element:** a subtitle line on the table (song · last film · a line from what Selim is reading or wrote), fed from the `now` file.
 
 ## 5. Sections
 - **Top level:** projects · research · cv · about · **after hours** (a hub page: films, photographs, writing, now, each with its own detail pages)
@@ -48,4 +55,5 @@ _Draft v2, 16 Nov 2026, written with Claude from Selim's answers, his writing, a
 
 ## Technical notes for the build
 - The home image is drawn with a small vanilla-JS canvas script (no libraries; about 6k points). **The links are real HTML `<a>` elements laid over the canvas**, so keyboard use, screen readers, search engines and Lighthouse all work. Without JS, the page shows a static drawing plus the links.
-- Prototypes: `design/sketch/home.html` (v1, current) and `design/sketch/home-v0.html` (first idea). Throwaways, not production code.
+- Prototypes: `design/sketch/rabbithole.html` (v2, current), `home.html` (v1, work column, rejected), `home-v0.html` (first table). Throwaways, not production code.
+- Production: one canvas island on the home page only, vanilla JS (no three.js) unless point counts need WebGL; all chapter text is real HTML; inner pages (projects, cv, research, after hours) are plain, fast, static Astro pages in the same palette.

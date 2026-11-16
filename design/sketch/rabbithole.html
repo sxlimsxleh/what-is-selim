@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>selim saleh — rabbit hole sketch</title>
+<meta name="description" content="Design sketch v2: a café table at night, and a scroll down the rabbit hole where the same points of light become each chapter of the work.">
+<style>
+  :root {
+    --bg: #100e11; --ink: #ece2c9; --ink-rgb: 236,226,201; --ink-dim: #9a9080;
+    --stamp: #ff8f3f; --stamp-rgb: 255,143,63; --accent: #c0392b;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, sans-serif;
+    --mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); scroll-behavior: smooth; }
+  body { margin: 0; color: var(--ink); background: var(--bg); font: 15px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+  a, button { color: inherit; font: inherit; }
+  :focus-visible { outline: 1px dashed var(--ink); outline-offset: 4px; }
+  .skip { position: fixed; left: -999px; top: 8px; background: var(--ink); color: var(--bg); padding: 6px 10px; z-index: 20; }
+  .skip:focus { left: 8px; }
+
+  canvas#c { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; }
+  .vignette { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(ellipse at 50% 50%, transparent 45%, #000b 100%); }
+  .grain { position: fixed; inset: -50%; z-index: 9; pointer-events: none; opacity: .07;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    animation: grain 1s steps(6) infinite; }
+  @keyframes grain { 0%{transform:translate(0,0)} 25%{transform:translate(-3%,2%)} 50%{transform:translate(2%,-4%)} 75%{transform:translate(-4%,-1%)} 100%{transform:translate(0,0)} }
+
+  /* ---- HUD ---- */
+  .hud { position: fixed; z-index: 8; font: 11px/1.6 var(--mono); letter-spacing: .04em; }
+  .hud.tl { top: 18px; left: 22px; }
+  .hud.tl b { font: 500 15px/1.3 var(--sans); letter-spacing: .01em; display: block; }
+  .hud.tl span { color: var(--ink-dim); }
+  .hud.tr { top: 18px; right: 22px; text-align: right; white-space: nowrap; }
+  .hud.tr .date { color: var(--stamp); }
+  .hud.bl { bottom: 16px; left: 22px; font: 13px var(--sans); color: var(--ink-dim); }
+  .hud.bl a { text-decoration: none; border-bottom: 1px solid #ffffff22; }
+  .hud.bl a:hover { color: var(--ink); border-color: var(--ink); }
+  .hud.br { bottom: 16px; right: 22px; color: var(--ink-dim); text-align: right; }
+
+  /* depth meter = chapter navigation */
+  nav.depth { position: fixed; z-index: 8; left: 22px; top: 50%; transform: translateY(-50%); font: 10.5px/1 var(--mono); }
+  nav.depth ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+  nav.depth a { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink-dim); opacity: .55; transition: opacity .3s, color .3s; }
+  nav.depth a::before { content: ""; width: 14px; height: 1px; background: currentColor; transition: width .3s; }
+  nav.depth a:hover, nav.depth a:focus-visible { opacity: 1; }
+  nav.depth a[aria-current="step"] { color: var(--ink); opacity: 1; }
+  nav.depth a[aria-current="step"]::before { width: 28px; background: var(--stamp); }
+  nav.depth .lbl { opacity: 0; transform: translateX(-4px); transition: opacity .3s, transform .3s; white-space: nowrap; }
+  nav.depth:hover .lbl, nav.depth a:focus-visible .lbl, nav.depth a[aria-current="step"] .lbl { opacity: 1; transform: none; }
+
+  /* ---- table labels (scene 0 only) ---- */
+  #tags { position: fixed; inset: 0; z-index: 5; pointer-events: none; transition: opacity .4s; }
+  #tags .tag { position: absolute; transform: translateY(-50%); pointer-events: auto; text-decoration: none; font-size: 14px; letter-spacing: .02em; color: var(--ink-dim); padding: 6px 4px; white-space: nowrap; background: none; border: 0; cursor: pointer; transition: color .3s, opacity .5s; }
+  #tags .tag.r { transform: translate(-100%, -50%); text-align: right; }
+  #tags .tag:hover, #tags .tag:focus-visible, #tags .tag.on { color: var(--ink); }
+  #tags .tag small { position: absolute; top: 100%; left: 4px; font-size: 11px; color: var(--ink-dim); opacity: 0; transition: opacity .3s; }
+  #tags .tag.r small { left: auto; right: 4px; }
+  #tags .tag:hover small, #tags .tag:focus-visible small, #tags .box small { opacity: .85; }
+  #tags .box { color: var(--ink); }
+  #tags .box::before { content: "◇ "; color: var(--stamp); }
+  #tags .box[aria-expanded="true"]::before { content: "◆ "; }
+  #tags .hobby { opacity: 0; visibility: hidden; }
+  #tags.open .hobby { opacity: 1; visibility: visible; transition-delay: .5s; }
+  #tags.gone { opacity: 0; } #tags.gone .tag { pointer-events: none; }
+
+  /* ---- chapters (real HTML text, scrolls over the canvas) ---- */
+  main { position: relative; z-index: 4; }
+  .ch { height: 150vh; position: relative; }
+  .ch:first-child { height: 120vh; }
+  .card { position: sticky; top: 22vh; width: min(360px, 34vw); margin-left: max(200px, 13vw); opacity: 0; transition: opacity .6s; }
+  .card.right { margin-left: auto; margin-right: max(40px, 6vw); }
+  .card.on { opacity: 1; }
+  .card .k { font: 11px/1 var(--mono); letter-spacing: .1em; color: var(--stamp); text-transform: uppercase; margin: 0 0 14px; }
+  .card h2 { font: 500 28px/1.15 var(--sans); letter-spacing: -.01em; margin: 0 0 12px; }
+  .card p { margin: 0 0 12px; color: var(--ink); }
+  .card .dim { color: var(--ink-dim); font-size: 14px; }
+  .card .stack { font: 11px/1.7 var(--mono); color: var(--ink-dim); }
+  .card .go { display: inline-block; margin-top: 6px; text-decoration: none; border-bottom: 1px solid var(--stamp); }
+  .card ul { list-style: none; padding: 0; margin: 0 0 12px; display: grid; gap: 6px; }
+  .card ul a { text-decoration: none; border-bottom: 1px solid #ffffff22; }
+  .hint { position: fixed; z-index: 6; left: 50%; bottom: 64px; transform: translateX(-50%); font: 11px var(--mono); letter-spacing: .12em; color: var(--ink-dim); text-transform: uppercase; transition: opacity .5s; animation: bob 2.4s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translate(-50%, 5px); } }
+  .subtitle { position: fixed; z-index: 6; left: 50%; bottom: 58px; transform: translateX(-50%); text-align: center; width: min(46ch, 90vw); font: 16px/1.35 var(--sans); color: #fbf3dc; text-shadow: 0 1px 3px #000; transition: opacity .6s; opacity: 0; }
+  .subtitle .src { display: block; font-size: 12px; color: var(--ink-dim); }
+
+  @media (max-width: 760px) {
+    .hud.tl span, .hud.br { display: none; }
+    .hud.tr { font-size: 10px; top: 14px; right: 14px; }
+    .hud.tl { top: 14px; left: 16px; }
+    .hud.bl { left: 16px; right: 16px; bottom: 12px; text-align: center; font-size: 12px; }
+    nav.depth { left: 8px; } nav.depth .lbl { display: none; }
+    .card { position: sticky; top: auto; bottom: 64px; width: auto; margin: 0 16px 0 34px; padding: 16px; background: linear-gradient(#100e11d9, #100e11f2); border-radius: 4px; }
+    .ch { display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 60px; }
+    .card.right { margin: 0 16px 0 34px; }
+    .card h2 { font-size: 22px; }
+    #tags .tag { font-size: 13px; }
+    .hint { bottom: 112px; white-space: nowrap; font-size: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .grain, .hint { animation: none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#ch-work">skip to the work</a>
+<canvas id="c" aria-hidden="true"></canvas>
+<div class="vignette"></div>
+
+<div class="hud tl"><b>selim saleh</b><span>data &amp; ai engineer · munich</span></div>
+<div class="hud tr" aria-hidden="true"><div>▶ PLAY&nbsp;&nbsp;SP</div><div id="tc">0:00:00</div><div class="date">NOV.16 2026</div></div>
+<div class="hud bl">in a hurry? <a href="#">cv (pdf)</a> · <a href="#ch-work">projects</a> · <a href="#ch-paper">paper</a> · <a href="#">github</a> · <a href="#" class="mail">email</a></div>
+<div class="hud br" id="meter" aria-hidden="true">depth 00 / 08</div>
+
+<nav class="depth" aria-label="chapters"><ol id="depthList"></ol></nav>
+
+<div id="tags">
+  <a class="tag" href="#ch-work" data-g="laptop">projects</a>
+  <a class="tag" href="#ch-paper" data-g="paper">research<small>the asail 2026 paper</small></a>
+  <a class="tag" href="#ch-road" data-g="cup">about me</a>
+  <button class="tag box" type="button" data-g="lid" aria-expanded="false">after hours<small>films · photographs · writing · now</small></button>
+  <a class="tag hobby" href="#ch-after" data-g="camera">photographs</a>
+  <a class="tag hobby" href="#ch-after" data-g="ticket">films</a>
+  <a class="tag hobby" href="#ch-after" data-g="notebook">writing</a>
+  <a class="tag hobby" href="#ch-after" data-g="cassette">now</a>
+</div>
+<div class="hint" id="hint">scroll · down the rabbit hole</div>
+<p class="subtitle" id="sub"></p>
+
+<main>
+  <section class="ch" id="ch-table" data-title="the table"><div class="card"><p class="k">00 · the table</p><h2 class="sr">a table at night.</h2><p class="dim">everything here is made of the same few thousand points of light. scroll, and they'll rearrange into everything else.</p></div></section>
+
+  <section class="ch" id="ch-name" data-title="hello"><div class="card right"><p class="k">01 · hello</p><h2>i build ai systems that show their evidence.</h2><p class="dim">m.sc. data engineering &amp; analytics at TUM. data &amp; ai engineering at IONITY. after hours, i make films, take photographs, and write about time.</p></div></section>
+
+  <section class="ch" id="ch-road" data-title="2,700 km"><div class="card"><p class="k">02 · 2,700 km</p><h2>cairo → munich</h2><p>b.sc. media engineering &amp; technology at the GUC (2017–22). data scientist at tactful, building ETL pipelines with NiFi and Airflow for clients (2022–24).</p><p>then i left home to try to live as i wanted. m.sc. at TUM since 2024; thesis: teaching a large language model to prefer egyptian arabic.</p></div></section>
+
+  <section class="ch" id="ch-dq" data-title="ionity"><div class="card right"><p class="k">03 · ionity · dec 2024 – now</p><h2>trust the data before the model.</h2><p>schema-driven data-quality validation running inside production pipelines: schemas, nulls, types, categories, keys, partitions, timestamps, numeric constraints.</p><p class="stack">python · pandas · pyarrow · aws athena / s3 / glue · airflow</p></div></section>
+
+  <section class="ch" id="ch-work" data-title="procure-agent"><div class="card"><p class="k">04 · procure-agent-lite · shipped</p><h2>messy inbox in. approved purchase order out.</h2><p>an extraction agent where every field cites the text it came from, deterministic policy checks, a human approval step, and idempotent writes to a deliberately flaky mock SAP.</p><p class="stack">python · pydantic · claude api · fastapi · sqlite · pytest · github actions</p><a class="go" href="https://github.com/sxlimsxleh/procure-agent-lite">read the code →</a></div></section>
+
+  <section class="ch" id="ch-paper" data-title="the paper"><div class="card right"><p class="k">05 · paper · ASAIL 2026</p><h2>re-ranking through an attribution lens.</h2><p>legal-qa answers should cite the passages they actually used. we estimate each passage's influence on the answer and train a re-ranker on it.</p><p class="dim">elganayni, saleh, grabmair</p><a class="go" href="#">read the paper →</a></div></section>
+
+  <section class="ch" id="ch-lw" data-title="ladewüste"><div class="card"><p class="k">06 · ladewüste · in progress</p><h2>where germany runs out of fast chargers.</h2><p>the national charger register, cleaned and tested with dbt, turned into an H3 coverage map: drop a virtual charger and watch the charging deserts shrink.</p><p class="stack">duckdb · dbt · h3 · fastapi · react · deck.gl</p><a class="go" href="#">all projects →</a></div></section>
+
+  <section class="ch" id="ch-after" data-title="after hours"><div class="card right"><p class="k">07 · after hours</p><h2>a different kind of evidence.</h2><ul><li><a href="#">films</a> <span class="dim">— things i wrote and directed</span></li><li><a href="#">photographs</a> <span class="dim">— series, mostly at night</span></li><li><a href="#">writing</a> <span class="dim">— essays about time and cinema</span></li><li><a href="#">now</a> <span class="dim">— reading, watching, listening</span></li></ul></div></section>
+
+  <section class="ch" id="ch-end" data-title="back to the table"><div class="card"><p class="k">08 · back to the table</p><h2>say hello.</h2><ul><li><a href="#" class="mail">email</a></li><li><a href="#">cv (pdf)</a></li><li><a href="https://github.com/sxlimsxleh">github</a> · <a href="#">linkedin</a></li><li><a href="https://letterboxd.com/seleemmofta7/">letterboxd</a> · <a href="https://selimsaleh.substack.com">substack</a></li></ul><p class="dim">the same piano keeps playing.</p></div></section>
+</main>
+<div class="grain"></div>
+
+<script>
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const INK = '236,226,201', STAMP = '255,143,63';
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const smooth = (a, b, v) => { const x = clamp((v - a) / (b - a)); return x * x * (3 - 2 * x); };
+  const ease = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+  document.querySelectorAll('.mail').forEach(m => m.href = 'mailto:' + ['selimmoftahsaleh', 'gmail.com'].join('@'));
+
+  const chapters = [...document.querySelectorAll('.ch')];
+  const NS = chapters.length;
+
+  // depth meter / chapter nav
+  const dl = document.getElementById('depthList');
+  chapters.forEach((c, i) => { const li = document.createElement('li'); li.innerHTML = `<a href="#${c.id}"><span class="lbl">${String(i).padStart(2, '0')} ${c.dataset.title}</span></a>`; dl.append(li); });
+  const depthLinks = [...dl.querySelectorAll('a')];
+
+  // ================= scene drawings (offscreen, in CSS px) =================
+  let W = 0, H = 0, mobile = false;
+  const off = document.createElement('canvas'), o = off.getContext('2d', { willReadFrequently: true });
+  const fill = a => o.fillStyle = `rgba(255,255,255,${a})`;
+  const line = (a, w) => { o.strokeStyle = `rgba(255,255,255,${a})`; o.lineWidth = w; };
+  const rr = (x, y, w, h, r) => { o.beginPath(); o.roundRect(x, y, w, h, r); };
+  const at = (x, y, rot, fn) => { o.save(); o.translate(x, y); o.rotate(rot * Math.PI / 180); fn(); o.restore(); };
+  // where the visual sits: shifted away from the text card on desktop
+  const frame = (side) => {
+    const u = Math.min(W, H) / 1000;
+    if (mobile) return { cx: W / 2, cy: H * .36, u: Math.min(W / 1000, H * .62 / 1000) };
+    return { cx: W / 2 + (side === 'l' ? -1 : side === 'r' ? 1 : 0) * W * .16, cy: H / 2, u: u * .92 };
+  };
+
+  // --- table (stage 1000×1000, centred) ---
+  const BOX = { x: 590, y: 610, w: 210, h: 140, rot: -6 };
+  const tableShapes = {
+    table() { o.beginPath(); o.arc(500, 500, 420, 0, 7); const g = o.createRadialGradient(500, 460, 20, 500, 500, 420); g.addColorStop(0, 'rgba(255,255,255,.16)'); g.addColorStop(1, 'rgba(255,255,255,.03)'); o.fillStyle = g; o.fill(); line(1, 7); o.stroke(); o.beginPath(); o.arc(500, 500, 404, 0, 7); line(.3, 2); o.stroke(); },
+    laptop() { at(395, 320, -4, () => { rr(-125, -120, 250, 95, 8); fill(.2); o.fill(); line(1, 4); o.stroke(); for (let i = 0; i < 5; i++) { rr(-105 + (i % 2) * 18, -102 + i * 15, 120 - i * 14 + (i % 3) * 30, 6, 2); fill(.75); o.fill(); } rr(-125, -20, 250, 150, 8); fill(.18); o.fill(); line(1, 4); o.stroke(); for (let r = 0; r < 4; r++) for (let k = 0; k < 11; k++) { rr(-105 + k * 19, -4 + r * 19, 14, 14, 2); fill(.8); o.fill(); } rr(-80, 74, 160, 10, 3); fill(.8); o.fill(); rr(-40, 92, 80, 28, 4); line(.9, 3); o.stroke(); }); },
+    paper() { at(690, 330, 8, () => { rr(-70, -92, 150, 195, 2); fill(.1); o.fill(); line(.6, 3); o.stroke(); rr(-80, -100, 150, 195, 2); fill(.2); o.fill(); line(1, 4); o.stroke(); rr(-62, -80, 90, 8, 2); fill(1); o.fill(); for (let i = 0; i < 4; i++) { rr(-62, -60 + i * 12, 114 - (i === 3 ? 40 : 0), 4, 2); fill(.6); o.fill(); } [22, 38, 30, 52, 64].forEach((h, i) => { rr(-56 + i * 22, 50 - h, 14, h, 1); fill(.85); o.fill(); }); o.beginPath(); o.moveTo(-62, 52); o.lineTo(54, 52); line(.8, 2); o.stroke(); for (let i = 0; i < 2; i++) { rr(-62, 64 + i * 12, 114, 4, 2); fill(.6); o.fill(); } o.beginPath(); o.moveTo(-74, -86); o.lineTo(-58, -94); line(1, 4); o.stroke(); }); },
+    cup() { at(300, 560, 0, () => { o.beginPath(); o.arc(0, 0, 62, 0, 7); fill(.12); o.fill(); line(.9, 3); o.stroke(); o.beginPath(); o.arc(0, 0, 40, 0, 7); fill(.35); o.fill(); line(1, 5); o.stroke(); o.beginPath(); o.arc(0, 0, 31, 0, 7); o.fillStyle = 'rgba(0,0,0,.9)'; o.fill(); o.beginPath(); o.arc(-6, -6, 11, Math.PI, 1.6 * Math.PI); line(.7, 3); o.stroke(); rr(38, -8, 28, 16, 8); line(1, 5); o.stroke(); }); },
+    box() { at(BOX.x, BOX.y, BOX.rot, () => { rr(-BOX.w / 2, -BOX.h / 2, BOX.w, BOX.h, 10); fill(.12); o.fill(); line(1, 4); o.stroke(); rr(-BOX.w / 2 + 12, -BOX.h / 2 + 12, BOX.w - 24, BOX.h - 24, 6); line(.5, 2); o.stroke(); }); },
+    lid() { at(BOX.x, BOX.y, BOX.rot, () => { rr(-BOX.w / 2 - 6, -BOX.h / 2 - 6, BOX.w + 12, BOX.h + 12, 12); fill(.3); o.fill(); line(1, 5); o.stroke(); rr(-BOX.w / 2 + 10, -BOX.h / 2 + 10, BOX.w - 20, BOX.h - 20, 8); line(.45, 2); o.stroke(); at(0, 0, -3, () => { rr(-70, -16, 140, 32, 2); fill(.75); o.fill(); for (let i = 0; i < 3; i++) { rr(-56 + i * 40, -4, 30, 6, 2); o.fillStyle = '#000'; o.fill(); } }); }); },
+    camera() { at(330, 760, -14, () => { rr(-70, -40, 140, 80, 10); fill(.3); o.fill(); line(1, 4); o.stroke(); o.beginPath(); o.arc(0, 0, 33, 0, 7); fill(.15); o.fill(); line(1, 5); o.stroke(); o.beginPath(); o.arc(0, 0, 19, 0, 7); fill(.9); o.fill(); o.beginPath(); o.arc(0, 0, 8, 0, 7); o.fillStyle = '#000'; o.fill(); rr(38, -34, 20, 11, 2); fill(.9); o.fill(); rr(-60, -52, 26, 12, 3); fill(.8); o.fill(); }); },
+    ticket() { at(545, 830, 9, () => { o.beginPath(); o.moveTo(-80, -32); o.lineTo(80, -32); o.lineTo(80, -9); o.arc(80, 0, 9, -Math.PI / 2, Math.PI / 2, true); o.lineTo(80, 32); o.lineTo(-80, 32); o.lineTo(-80, 9); o.arc(-80, 0, 9, Math.PI / 2, -Math.PI / 2, true); o.closePath(); fill(.25); o.fill(); line(1, 3); o.stroke(); for (let y = -26; y <= 26; y += 7) { o.beginPath(); o.arc(40, y, 2, 0, 7); fill(1); o.fill(); } for (let i = 0; i < 3; i++) { rr(-64, -18 + i * 13, 85 - i * 22, 5, 2); fill(.8); o.fill(); } }); },
+    notebook() { at(770, 700, 12, () => { rr(-50, -66, 100, 132, 4); fill(.18); o.fill(); line(1, 4); o.stroke(); for (let i = 0; i < 6; i++) { o.beginPath(); o.moveTo(-38, -44 + i * 17); o.lineTo(38 - (i % 3) * 12, -44 + i * 17); line(.7, 2); o.stroke(); } o.beginPath(); o.moveTo(-50, -66); o.lineTo(-50, 66); line(1, 7); o.stroke(); }); },
+    cassette() { at(805, 515, -10, () => { rr(-62, -40, 124, 80, 7); fill(.22); o.fill(); line(1, 4); o.stroke(); rr(-44, -28, 88, 34, 4); line(.8, 2); o.stroke(); for (const x of [-23, 23]) { o.beginPath(); o.arc(x, -11, 11, 0, 7); line(1, 3); o.stroke(); o.beginPath(); o.arc(x, -11, 4, 0, 7); fill(1); o.fill(); } rr(-38, 12, 54, 6, 2); fill(.7); o.fill(); }); },
+  };
+  const TGROUPS = Object.keys(tableShapes), HOBBY = ['camera', 'ticket', 'notebook', 'cassette'];
+  let tableT = null; // {s, ox, oy}: stage → screen transform for the table
+  const tableXform = () => { const { u } = frame('c'); const s = u * (mobile ? .98 : .82); return { s, ox: W / 2 - 500 * s, oy: (mobile ? H * .40 : H / 2) - 500 * s }; };
+
+  // --- generic scenes: each returns nothing, just draws in white with alpha = density ---
+  const geo = { cairo: [31.24, 30.04], munich: [11.58, 48.14] };
+  const DE = [[6.0,51.8],[6.1,50.8],[6.4,49.5],[7.6,49.0],[8.2,48.0],[7.6,47.6],[9.5,47.6],[10.5,47.5],[12.9,47.6],[13.0,48.3],[13.8,48.8],[12.4,50.3],[14.8,50.9],[14.6,52.6],[14.2,53.9],[12.0,54.2],[11.0,54.0],[9.9,54.8],[8.6,54.9],[8.6,53.6],[7.0,53.4],[7.2,52.4]];
+  const scenes = [];
+  // overlay state for animated layers (computed when scenes are built)
+  const ov = {};
+
+  scenes[1] = () => {                                   // 01 name, latin + arabic
+    const { cx, cy, u } = frame('l');
+    o.textAlign = 'center'; o.textBaseline = 'middle'; fill(1);
+    const big = Math.min(mobile ? W * .17 : 170 * u, 190);
+    o.font = `600 ${big}px ${getComputedStyle(document.body).fontFamily}`;
+    o.fillText('selim', cx, cy - big * .62); o.fillText('saleh', cx, cy + big * .38);
+    o.font = `500 ${big * .42}px "DejaVu Sans", "Noto Naskh Arabic", "Geeza Pro", sans-serif`; o.direction = 'rtl'; fill(.55);
+    o.fillText('سليم صالح', cx, cy + big * 1.2); o.direction = 'ltr';
+  };
+  scenes[2] = () => {                                   // 02 cairo → munich
+    const { cx, cy, u } = frame('r');
+    const S = (mobile ? W * .82 : 640 * u) / 22;          // px per degree
+    const P = ([lon, lat]) => [cx + (lon - 21.4) * S * Math.cos(39 * Math.PI / 180), cy - (lat - 39) * S];
+    for (let lon = 4; lon <= 38; lon += 1.2) for (let lat = 26; lat <= 54; lat += 1.2) { const [x, y] = P([lon, lat]); o.beginPath(); o.arc(x, y, 1.3, 0, 7); fill(.18); o.fill(); }
+    const A = P(geo.cairo), B = P(geo.munich), M = [(A[0] + B[0]) / 2 - 120 * u, (A[1] + B[1]) / 2 - 60 * u];
+    o.beginPath(); o.moveTo(...A); o.quadraticCurveTo(...M, ...B); line(.85, 3); o.setLineDash([2, 7]); o.stroke(); o.setLineDash([]);
+    for (const [p, r] of [[A, 22], [B, 22]]) { o.beginPath(); o.arc(...p, r * u * 1.4, 0, 7); line(1, 3); o.stroke(); o.beginPath(); o.arc(...p, 7 * u * 1.4, 0, 7); fill(1); o.fill(); }
+    ov.road = { A, B, M, u };
+  };
+  scenes[3] = () => {                                   // 03 a dataset being validated
+    const { cx, cy, u } = frame('l');
+    const cols = mobile ? 7 : 9, rows = 14, cw = (mobile ? W * .1 : 64 * u), ch = (mobile ? 16 : 22 * u);
+    const x0 = cx - cols * cw / 2, y0 = cy - rows * ch / 2;
+    rr(x0 - 10, y0 - 34 * u, cols * cw + 20, rows * ch + 44 * u, 4); line(.8, 2); o.stroke();
+    for (let c = 0; c < cols; c++) { rr(x0 + c * cw + 4, y0 - 22 * u, cw * .6, 7, 2); fill(1); o.fill(); }
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) { rr(x0 + c * cw + 4, y0 + r * ch + ch * .3, cw * (0.35 + ((r * 7 + c * 3) % 5) * .1), ch * .35, 2); fill(.55); o.fill(); }
+    const bad = []; for (let i = 0; i < 9; i++) bad.push([(i * 5 + 2) % cols, (i * 7 + 3) % rows]);
+    ov.dq = { x0, y0, cw, ch, cols, rows, bad, u };
+  };
+  scenes[4] = () => {                                   // 04 procure-agent pipeline
+    const { cx, cy, u } = frame('r');
+    const names = ['inbox', 'extract', 'ground', 'policy', 'approve', 'sap'];
+    const n = names.length, nodes = [];
+    for (let i = 0; i < n; i++) {
+      const x = mobile ? cx + (i % 2 ? 1 : -1) * W * .2 : cx - 330 * u + i * 132 * u;
+      const y = mobile ? cy - H * .22 + i * H * .085 : cy + (i % 2 ? 60 : -60) * u;
+      nodes.push([x, y]);
+    }
+    for (let i = 0; i < n - 1; i++) { o.beginPath(); o.moveTo(...nodes[i]); o.lineTo(...nodes[i + 1]); line(.5, 2); o.setLineDash([3, 6]); o.stroke(); o.setLineDash([]); }
+    nodes.forEach(([x, y], i) => {
+      const r = 34 * u * (mobile ? 1.1 : 1);
+      if (i === 4) { o.beginPath(); o.arc(x, y, r * 1.15, 0, 7); line(1, 4); o.stroke(); o.beginPath(); o.arc(x, y, r * .55, 0, 7); fill(.35); o.fill(); }  // the human
+      else { rr(x - r, y - r * .75, r * 2, r * 1.5, 6); fill(.22); o.fill(); line(1, 3); o.stroke(); }
+      if (i === 0) { o.beginPath(); o.moveTo(x - r, y - r * .75); o.lineTo(x, y); o.lineTo(x + r, y - r * .75); line(1, 3); o.stroke(); }
+      if (i === 5) for (let k = 0; k < 3; k++) { rr(x - r * .7, y - r * .45 + k * r * .35, r * 1.4, r * .18, 2); fill(.8); o.fill(); }
+    });
+    ov.pipe = { nodes, names, u };
+  };
+  scenes[5] = () => {                                   // 05 paper: passages ← answer
+    const { cx, cy, u } = frame('l');
+    const pw = mobile ? W * .38 : 230 * u, ph = mobile ? 30 : 46 * u, gap = mobile ? 9 : 14 * u, n = 6;
+    const px = cx - (mobile ? W * .38 : 300 * u), py0 = cy - (n * (ph + gap)) / 2;
+    const passages = [];
+    for (let i = 0; i < n; i++) { const y = py0 + i * (ph + gap); rr(px, y, pw, ph, 3); line(.8, 2); o.stroke(); for (let k = 0; k < 3; k++) { rr(px + 10, y + 8 + k * (ph - 16) / 2.6, pw * (.85 - k * .15 - (i % 3) * .05), 3, 1); fill(.6); o.fill(); } passages.push([px, y, pw, ph]); }
+    const ax = cx + (mobile ? W * .08 : 60 * u), aw = mobile ? W * .32 : 240 * u, ah = mobile ? H * .22 : 260 * u, ay = cy - ah / 2;
+    rr(ax, ay, aw, ah, 4); fill(.12); o.fill(); line(1, 3); o.stroke();
+    const sent = []; for (let k = 0; k < 4; k++) { const y = ay + 22 * u + k * (ah - 44 * u) / 3.3; for (let j = 0; j < 2; j++) { rr(ax + 14, y + j * 11, aw * (.8 - j * .25), 4, 1); fill(.9); o.fill(); } sent.push([ax, y + 6]); }
+    ov.paper = { passages, sent, u };
+  };
+  scenes[6] = () => {                                   // 06 ladewüste: hex coverage of germany
+    const { cx, cy, u } = frame('r');
+    const S = (mobile ? W * .8 : 520 * u) / 9;
+    const P = ([lon, lat]) => [cx + (lon - 10.4) * S * Math.cos(51 * Math.PI / 180), cy - (lat - 51.2) * S];
+    const poly = DE.map(P);
+    o.beginPath(); poly.forEach((p, i) => i ? o.lineTo(...p) : o.moveTo(...p)); o.closePath(); line(.9, 3); o.stroke();
+    const inside = (x, y) => { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const [xi, yi] = poly[i], [xj, yj] = poly[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c; } return c; };
+    const r = (mobile ? 9 : 13 * u), hexes = [];
+    for (let row = 0, y = cy - 520 * u; y < cy + 520 * u; row++, y += r * 1.5) for (let x = cx - 520 * u + (row % 2) * r * .87; x < cx + 520 * u; x += r * 1.73) if (inside(x, y)) hexes.push([x, y]);
+    hexes.forEach(([x, y]) => { o.beginPath(); for (let k = 0; k < 6; k++) { const a = Math.PI / 6 + k * Math.PI / 3; o.lineTo(x + Math.cos(a) * r * .8, y + Math.sin(a) * r * .8); } o.closePath(); fill(.16); o.fill(); });
+    ov.lw = { hexes, r, seed: hexes.map(() => Math.random()) };
+  };
+  scenes[7] = () => {                                   // 07 after hours: a film strip in a beam
+    const { cx, cy, u } = frame('l');
+    const fw = mobile ? W * .55 : 300 * u, fh = fw * .62, frames = 3;
+    for (let i = 0; i < frames; i++) {
+      const y = cy - (frames * (fh + 26 * u)) / 2 + i * (fh + 26 * u);
+      rr(cx - fw / 2 - 34 * u, y - 13 * u, fw + 68 * u, fh + 26 * u, 2); fill(.1); o.fill();
+      rr(cx - fw / 2, y, fw, fh, 2); line(1, 3); o.stroke();
+      for (let k = 0; k < 5; k++) { rr(cx - fw / 2 - 24 * u, y + k * fh / 5 + 4, 12 * u, fh / 5 - 10, 2); fill(.9); o.fill(); rr(cx + fw / 2 + 12 * u, y + k * fh / 5 + 4, 12 * u, fh / 5 - 10, 2); fill(.9); o.fill(); }
+      if (i === 1) { o.beginPath(); o.arc(cx, y + fh / 2, fh * .22, 0, 7); fill(.4); o.fill(); }  // a figure in the middle frame
+    }
+    ov.after = { cx, cy, fw, u };
+  };
+
+  // ================= sampling: N points, one target per scene =================
+  let N = 0, P = [], targets = []; // targets[scene] = Float32Array(N*3): x, y, alpha
+  const sample = (drawFn) => {
+    o.clearRect(0, 0, W, H); o.save(); drawFn(); o.restore();
+    const d = o.getImageData(0, 0, W, H).data, cand = [];
+    const step = 2;
+    for (let y = 0; y < H; y += step) for (let x = 0; x < W; x += step) {
+      const jx = x + rnd(-step / 2, step / 2), jy = y + rnd(-step / 2, step / 2);
+      if (jx < 0 || jy < 0 || jx >= W || jy >= H) continue;
+      const i = ((jy | 0) * W + (jx | 0)) * 4, al = d[i + 3] / 255;
+      if (d[i] > 30 && Math.random() < Math.pow(al, 1.6)) cand.push(jx, jy);
+    }
+    return cand;
+  };
+  const fitN = (cand, alpha = .95) => {           // shuffle-subsample or pad with dust
+    const k = cand.length / 2, idx = [...Array(k).keys()];
+    for (let i = k - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [idx[i], idx[j]] = [idx[j], idx[i]]; }
+    const t = new Float32Array(N * 3);
+    for (let n = 0; n < N; n++) {
+      if (n < k) { t[n * 3] = cand[idx[n] * 2]; t[n * 3 + 1] = cand[idx[n] * 2 + 1]; t[n * 3 + 2] = alpha; }
+      else { t[n * 3] = rnd(0, W); t[n * 3 + 1] = rnd(0, H); t[n * 3 + 2] = .07; }
+    }
+    return t;
+  };
+
+  // table: grouped, with closed + open homes and hidden hobbies
+  let tableGroups = null; // Int16Array group per point for scene 0
+  let tableOpen = null;   // Float32Array(N*2) open-state homes
+  function buildTable() {
+    tableT = tableXform();
+    const { s, ox, oy } = tableT, all = [];
+    TGROUPS.forEach((g, gi) => {
+      const cand = sample(() => { o.translate(ox, oy); o.scale(s, s); tableShapes[g](); });
+      for (let i = 0; i < cand.length; i += 2) all.push([cand[i], cand[i + 1], gi]);
+    });
+    for (let i = all.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [all[i], all[j]] = [all[j], all[i]]; }
+    const t = new Float32Array(N * 3), op = new Float32Array(N * 2), grp = new Int16Array(N).fill(-1);
+    const bx = ox + BOX.x * s, by = oy + BOX.y * s;
+    for (let n = 0; n < N; n++) {
+      if (n < all.length) {
+        const [x, y, gi] = all[n], g = TGROUPS[gi]; grp[n] = gi;
+        t[n * 3] = x; t[n * 3 + 1] = y; t[n * 3 + 2] = gi === 0 ? .6 : .95; op[n * 2] = x; op[n * 2 + 1] = y;
+        if (HOBBY.includes(g)) { t[n * 3] = bx + rnd(-BOX.w / 2.6, BOX.w / 2.6) * s; t[n * 3 + 1] = by + rnd(-BOX.h / 2.6, BOX.h / 2.6) * s; }
+        if (g === 'lid') { op[n * 2] = bx + (x - bx) * 1.35; op[n * 2 + 1] = by + (y - by) * 1.35 - 30 * s; }
+      } else { t[n * 3] = rnd(0, W); t[n * 3 + 1] = rnd(0, H); t[n * 3 + 2] = .07; op[n * 2] = t[n * 3]; op[n * 2 + 1] = t[n * 3 + 1]; }
+    }
+    tableGroups = grp; tableOpen = op;
+    return t;
+  }
+
+  function build() {
+    W = innerWidth; H = innerHeight; mobile = W < 760;
+    off.width = W; off.height = H;
+    const dpr = Math.min(devicePixelRatio || 1, 2); cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    N = mobile ? 6500 : 12000;
+    const t0 = buildTable();
+    targets = [t0];
+    for (let i = 1; i < NS - 1; i++) targets[i] = fitN(sample(scenes[i]));
+    targets[NS - 1] = t0;                                                // back to the table
+    if (P.length !== N) P = Array.from({ length: N }, () => ({ x: rnd(0, W), y: rnd(0, H), ph: rnd(0, 6.28), s: rnd(.7, 1.35), dl: Math.random() }));
+    placeTags();
+  }
+
+  // ================= table labels (scene 0) =================
+  const tagsEl = document.getElementById('tags'), tags = [...tagsEl.querySelectorAll('.tag')], boxBtn = tagsEl.querySelector('.box');
+  const anchor = { laptop: [300, 250], paper: [760, 250], cup: [240, 560], lid: [700, 640], camera: [270, 770], ticket: [470, 850], notebook: [820, 720], cassette: [860, 500] };
+  const DESK = { laptop: [-60, 110], paper: [1060, 110], cup: [-60, 520], lid: [1060, 930], camera: [-60, 860], ticket: [-60, 975], notebook: [1060, 760], cassette: [1060, 420] };
+  const MOB  = { laptop: [20, -120], paper: [980, -120], cup: [20, -50], cassette: [980, -50], lid: [980, 1120], camera: [20, 1060], ticket: [20, 1140], notebook: [980, 1060] };
+  function placeTags() {
+    const L = mobile ? MOB : DESK, { s, ox, oy } = tableT;
+    tags.forEach(a => { const [x, y] = L[a.dataset.g]; a.style.left = ox + x * s + 'px'; a.style.top = oy + y * s + 'px'; a.classList.toggle('r', x > 500); a._lab = [x, y]; });
+  }
+  let active = -1, open = 0, openT = 0;
+  tags.forEach(a => {
+    const gi = TGROUPS.indexOf(a.dataset.g);
+    a.addEventListener('mouseenter', () => active = gi); a.addEventListener('focus', () => active = gi);
+    a.addEventListener('mouseleave', () => { if (active === gi) active = -1; }); a.addEventListener('blur', () => { if (active === gi) active = -1; });
+  });
+  boxBtn.addEventListener('click', () => { open = open ? 0 : 1; boxBtn.setAttribute('aria-expanded', !!open); tagsEl.classList.toggle('open', !!open); if (reduce) openT = open; });
+
+  // ================= scroll → scene position =================
+  let sPos = 0;
+  const cards = chapters.map(c => c.querySelector('.card'));
+  function readScroll() {
+    let i = 0; const y = scrollY + innerHeight * .5;
+    while (i < NS - 1 && chapters[i + 1].offsetTop <= y) i++;
+    const top = chapters[i].offsetTop, h = chapters[i].offsetHeight;
+    const local = i === 0 ? clamp(scrollY / Math.max(1, chapters[1].offsetTop - innerHeight * .5)) : clamp((y - top) / h);
+    sPos = i + (i < NS - 1 ? local : 0);
+    cards.forEach((c, k) => c.classList.toggle('on', k === i && (local < .78 || k === NS - 1) && k !== 0));
+    depthLinks.forEach((a, k) => k === i ? a.setAttribute('aria-current', 'step') : a.removeAttribute('aria-current'));
+    document.getElementById('meter').textContent = `depth ${String(i).padStart(2, '0')} / ${String(NS - 1).padStart(2, '0')}`;
+    document.getElementById('hint').style.opacity = sPos < .15 ? 1 : 0;
+    tagsEl.classList.toggle('gone', sPos > .25);
+  }
+  addEventListener('scroll', readScroll, { passive: true });
+
+  // ================= render =================
+  const tStart = performance.now();
+  let lastT = tStart, fps = 60;
+  function frameDraw(now) {
+    const t = (now - tStart) / 1000; fps = fps * .95 + (1000 / Math.max(1, now - lastT)) * .05; lastT = now;
+    ctx.clearRect(0, 0, W, H);
+    if (!reduce) openT += (open - openT) * .045;
+
+    // lamp
+    const flick = reduce ? 1 : .94 + .06 * Math.sin(t * 7.3) * Math.sin(t * 2.1);
+    const g = ctx.createRadialGradient(W / 2, H * .46, 0, W / 2, H / 2, Math.max(W, H) * .6);
+    g.addColorStop(0, `rgba(236,214,170,${.11 * flick})`); g.addColorStop(.5, 'rgba(236,214,170,.03)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+    const i = Math.min(NS - 2, Math.floor(sPos)), local = sPos - i;
+    let m = reduce ? (local > .62 ? 1 : 0) : smooth(.38, .92, local);
+    const A = targets[i], B = targets[i + 1];
+    const inTable = (i === 0 && m < 1) || (i === NS - 2 && m > 0);
+    const tableW = i === 0 ? 1 - m : (i === NS - 2 ? m : 0);
+
+    for (let n = 0; n < N; n++) {
+      const p = P[n];
+      let ax = A[n * 3], ay = A[n * 3 + 1], aa = A[n * 3 + 2], bx = B[n * 3], by = B[n * 3 + 1], ba = B[n * 3 + 2];
+      let gi = -1;
+      if (inTable) {                                      // apply box-open state to table targets
+        gi = tableGroups[n];
+        const isH = gi >= 0 && HOBBY.includes(TGROUPS[gi]), isLid = gi >= 0 && TGROUPS[gi] === 'lid';
+        const u = ease(clamp(openT * 1.4 - p.dl * .4));
+        const tx = targets[0][n * 3] + (tableOpen[n * 2] - targets[0][n * 3]) * u, ty = targets[0][n * 3 + 1] + (tableOpen[n * 2 + 1] - targets[0][n * 3 + 1]) * u;
+        let ta = targets[0][n * 3 + 2]; if (isH) ta *= clamp(u * 1.5); if (isLid) ta *= 1 - .92 * u;
+        if (i === 0) { ax = tx; ay = ty; aa = ta; } else { bx = tx; by = ty; ba = ta; }
+      }
+      const mm = reduce ? m : clamp(m * 1.25 - p.dl * .25);
+      const e = ease(mm);
+      // a little swirl mid-flight, like dust caught in the beam
+      const swirl = Math.sin(e * Math.PI) * (reduce ? 0 : 60);
+      let x = ax + (bx - ax) * e + Math.cos(p.ph + t * .4) * swirl, y = ay + (by - ay) * e + Math.sin(p.ph * 1.7 + t * .4) * swirl;
+      if (!reduce) { x += Math.sin(t * .7 + p.ph) * 1.1; y += Math.cos(t * .5 + p.ph) * 1.1; }
+      // intro: points gather from where they were
+      const intro = reduce ? 1 : ease(clamp(t / 2.6 * 1.5 - p.dl * .5));
+      x = p.x + (x - p.x) * intro; y = p.y + (y - p.y) * intro;
+      let a = (aa + (ba - aa) * e) * (.65 + .35 * Math.sin(t * 1.3 + p.ph * 3)) * (.25 + .75 * intro);
+      if (i === 0 && active >= 0 && tableW > .5) { const f = gi === active || (TGROUPS[active] === 'lid' && gi >= 0 && HOBBY.includes(TGROUPS[gi])); a *= f ? 1.35 : (gi === 0 ? .7 : .35); }
+      if (a < .015) continue;
+      ctx.fillStyle = `rgba(${INK},${Math.min(1, a).toFixed(3)})`;
+      const sz = p.s * 1.5; ctx.fillRect(x - sz / 2, y - sz / 2, sz, sz);
+    }
+
+    // leader lines on the table
+    if (i === 0 && tableW > .02 && tableT) {
+      const { s, ox, oy } = tableT;
+      tags.forEach(a => {
+        const isH = a.classList.contains('hobby'), vis = (isH ? clamp(openT * 2 - 1) : 1) * tableW;
+        if (vis <= .01) return;
+        const [sx, sy] = anchor[a.dataset.g]; const ax = ox + sx * s, ay = oy + sy * s;
+        const r = a.getBoundingClientRect(); const ex = a.classList.contains('r') ? r.left - 4 : r.left + a.firstChild.textContent.length * 7.6 + (a.classList.contains('box') ? 24 : 8), ey = r.top + r.height / 2;
+        const steps = Math.max(6, Math.hypot(ex - ax, ey - ay) / 7 | 0), on = TGROUPS.indexOf(a.dataset.g) === active;
+        for (let k = 0; k <= steps; k++) { const u = k / steps; ctx.fillStyle = `rgba(${INK},${((on ? .8 : .25) * vis * (reduce ? 1 : .8 + .2 * Math.sin(t * 3 - u * 8))).toFixed(3)})`; ctx.fillRect(ax + (ex - ax) * u - .8, ay + (ey - ay) * u - .8, 1.6, 1.6); }
+        a.classList.toggle('on', on);
+      });
+    }
+
+    // ---- animated overlays: weight = how fully we're in that scene ----
+    const w = k => (k === i ? 1 - m : k === i + 1 ? m : 0) * (reduce ? 1 : 1);
+    const mono = `11px ${getComputedStyle(document.body).getPropertyValue('--mono')}`;
+    ctx.font = mono; ctx.textBaseline = 'middle';
+    const tt = reduce ? 1.3 : t;
+
+    if (w(2) > .05 && ov.road) {                        // a traveller along the arc
+      const { A, B, M } = ov.road, a = w(2), q = (tt * .18) % 1;
+      const bez = u => [(1 - u) ** 2 * A[0] + 2 * (1 - u) * u * M[0] + u * u * B[0], (1 - u) ** 2 * A[1] + 2 * (1 - u) * u * M[1] + u * u * B[1]];
+      for (let k = 0; k < 14; k++) { const [x, y] = bez(clamp(q - k * .008)); ctx.fillStyle = `rgba(${STAMP},${(a * (1 - k / 14)).toFixed(3)})`; ctx.fillRect(x - 2, y - 2, 4, 4); }
+      ctx.fillStyle = `rgba(${INK},${(a * .85).toFixed(3)})`; ctx.textAlign = 'left';
+      ctx.fillText('CAIRO  30.04°N 31.24°E', A[0] + 26, A[1] + 4); ctx.fillText('MÜNCHEN  48.14°N 11.58°E', B[0] + 26, B[1] - 4);
+      ctx.fillStyle = `rgba(${STAMP},${a.toFixed(3)})`; ctx.fillText(`${Math.round(2700 * (reduce ? 1 : q))} km`, M[0] - 10, M[1] - 18);
+    }
+    if (w(3) > .05 && ov.dq) {                          // a scan line validating the table
+      const { x0, y0, cw, ch, cols, rows, bad } = ov.dq, a = w(3), q = (tt * .22) % 1.25, sx = x0 + q * cols * cw;
+      ctx.fillStyle = `rgba(${STAMP},${(a * .9).toFixed(3)})`; ctx.fillRect(sx, y0 - 26, 1.5, rows * ch + 30);
+      bad.forEach(([c, r]) => { if (x0 + c * cw < sx) { ctx.strokeStyle = `rgba(${STAMP},${a.toFixed(3)})`; ctx.lineWidth = 1.5; ctx.strokeRect(x0 + c * cw + 1, y0 + r * ch + 1, cw - 4, ch - 3); } });
+      const checks = ['schema', 'nulls', 'types', 'categories', 'keys', 'partitions', 'timestamps', 'ranges'];
+      ctx.textAlign = 'left';
+      checks.forEach((c, k) => { const done = q * checks.length > k; ctx.fillStyle = `rgba(${done ? STAMP : INK},${(a * (done ? .95 : .4)).toFixed(3)})`; const lx = mobile ? x0 + (k % 2) * cw * cols / 2 : x0 + cols * cw + 26, ly = mobile ? y0 + rows * ch + 22 + (k / 2 | 0) * 16 : y0 + k * 20 + 6; ctx.fillText(`${done ? '■' : '□'} ${c}`, lx, ly); });
+    }
+    if (w(4) > .05 && ov.pipe) {                        // documents flowing through the agent
+      const { nodes, names } = ov.pipe, a = w(4);
+      ctx.textAlign = 'center';
+      nodes.forEach(([x, y], k) => { ctx.fillStyle = `rgba(${INK},${(a * .8).toFixed(3)})`; ctx.fillText(names[k], x, y + 54 * ov.pipe.u + 6); });
+      for (let d = 0; d < 6; d++) {
+        let q = ((tt * .12 + d / 6) % 1) * (nodes.length - 1), seg = Math.floor(q), f = q - seg;
+        if (seg === 3 && f > .6) f = .6 + (f - .6) * .25;            // documents wait for a human
+        const [x1, y1] = nodes[seg], [x2, y2] = nodes[seg + 1];
+        ctx.fillStyle = `rgba(${STAMP},${a.toFixed(3)})`; ctx.fillRect(x1 + (x2 - x1) * f - 3, y1 + (y2 - y1) * f - 4, 6, 8);
+      }
+    }
+    if (w(5) > .05 && ov.paper) {                       // attribution threads + re-ranking
+      const { passages, sent } = ov.paper, a = w(5);
+      const order = [3, 0, 5, 1, 4, 2], phase = Math.floor(tt / 2.5) % 4;
+      sent.forEach(([sx, sy], k) => {
+        const p = passages[order[(k + phase) % 3]], ex = p[0] + p[2], ey = p[1] + p[3] / 2;
+        ctx.strokeStyle = `rgba(${STAMP},${(a * (.35 + .25 * Math.sin(tt * 2 + k))).toFixed(3)})`; ctx.lineWidth = 1; ctx.setLineDash([2, 4]);
+        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.bezierCurveTo(sx - 60, sy, ex + 60, ey, ex, ey); ctx.stroke(); ctx.setLineDash([]);
+      });
+      ctx.textAlign = 'right';
+      passages.forEach((p, k) => { const rank = (order.indexOf(k) - phase + 6) % 6 + 1; ctx.fillStyle = `rgba(${rank <= 3 ? STAMP : INK},${(a * (rank <= 3 ? .95 : .4)).toFixed(3)})`; ctx.fillText(`#${rank}`, p[0] - 10, p[1] + p[3] / 2); });
+    }
+    if (w(6) > .05 && ov.lw) {                          // chargers dropping, deserts shrinking
+      const { hexes, r, seed } = ov.lw, a = w(6), cyc = (tt % 9) / 9, drops = [[.38, .3], [.62, .55], [.45, .75], [.25, .6], [.7, .2]];
+      const xs = hexes.map(h => h[0]), ys = hexes.map(h => h[1]), minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+      const placed = drops.filter((_, k) => cyc > k * .14 + .05).map(([u, v]) => [minX + u * (maxX - minX), minY + v * (maxY - minY)]);
+      hexes.forEach(([x, y], k) => {
+        const desert = seed[k] < .32; if (!desert) return;
+        const covered = placed.some(([px, py]) => Math.hypot(px - x, py - y) < r * 5.5);
+        ctx.fillStyle = covered ? `rgba(${INK},${(a * .5).toFixed(3)})` : `rgba(${STAMP},${(a * .55).toFixed(3)})`;
+        ctx.beginPath(); for (let j = 0; j < 6; j++) { const an = Math.PI / 6 + j * Math.PI / 3; ctx.lineTo(x + Math.cos(an) * r * .55, y + Math.sin(an) * r * .55); } ctx.closePath(); ctx.fill();
+      });
+      placed.forEach(([x, y]) => { ctx.strokeStyle = `rgba(${INK},${(a * .7).toFixed(3)})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(x, y, r * 5.5, 0, 7); ctx.stroke(); ctx.fillStyle = `rgba(${INK},${a.toFixed(3)})`; ctx.fillRect(x - 3, y - 3, 6, 6); });
+      ctx.textAlign = 'left'; ctx.fillStyle = `rgba(${STAMP},${a.toFixed(3)})`; ctx.fillText('■ charging desert', minX, maxY + 34); ctx.fillStyle = `rgba(${INK},${a.toFixed(3)})`; ctx.fillText('○ new fast charger', minX + 150, maxY + 34);
+    }
+    if (w(7) > .05 && ov.after) {                       // the projector beam
+      const { cx, cy, fw } = ov.after, a = w(7) * flick;
+      const bg = ctx.createLinearGradient(cx, H, cx, cy);
+      bg.addColorStop(0, `rgba(255,236,200,${(a * .16).toFixed(3)})`); bg.addColorStop(1, 'rgba(255,236,200,0)');
+      ctx.fillStyle = bg; ctx.beginPath(); ctx.moveTo(cx - 14, H + 10); ctx.lineTo(cx + 14, H + 10); ctx.lineTo(cx + fw * .7, cy - fw * .5); ctx.lineTo(cx - fw * .7, cy - fw * .5); ctx.closePath(); ctx.fill();
+    }
+    // subtitles show only in the table + after-hours scenes
+    sub.style.opacity = (i === 0 && tableW > .6) || (!mobile && w(7) > .6) ? 1 : 0;
+    document.getElementById('meter').dataset.fps = Math.round(fps);
+  }
+  const loop = now => { frameDraw(now); requestAnimationFrame(loop); };
+
+  // camcorder timecode + subtitles
+  const tc = document.getElementById('tc');
+  setInterval(() => { const s = (performance.now() - tStart) / 1000 | 0; tc.textContent = `${s / 3600 | 0}:${String((s / 60 | 0) % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }, 500);
+  const sub = document.getElementById('sub');
+  const lines = [['[the same piano keeps playing]', 'listening — LCD Soundsystem, “All My Friends”'], ['“How long does tomorrow last?”', 'last watched — Eternity and a Day (1998)'], ['nostalgia is the evidence submitted in the courtroom of existence.', 'from my writing']];
+  let li = 0; const show = () => { const [l, s] = lines[li++ % lines.length]; sub.textContent = l; const sp = document.createElement('span'); sp.className = 'src'; sp.textContent = s; sub.append(sp); };
+  show(); if (!reduce) setInterval(show, 7000);
+
+  let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { build(); readScroll(); }, 200); });
+  build(); readScroll();
+  if (reduce) { const tick = () => { frameDraw(performance.now() + 1e5); }; addEventListener('scroll', tick, { passive: true }); setInterval(tick, 500); tick(); }
+  else requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
