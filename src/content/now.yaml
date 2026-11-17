@@ -1,0 +1,13 @@
+# The "now" page. Edit this one file to update it, then change `updated`.
+# Each list takes items like: - { title: "...", by: "...", note: "...", url: "https://..." }
+current:
+  updated: 2026-11-17
+  building:
+    - { title: morehere., note: a third-places scout for newcomers to Munich }
+    - { title: my M.Sc. thesis, note: teaching a language model to prefer Egyptian Arabic, due January 2027 }
+  reading: []
+  watching: []
+  listening:
+    - { title: All My Friends, by: LCD Soundsystem }
+  playing: []
+  learning: []

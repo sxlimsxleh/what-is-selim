@@ -1,0 +1,20 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { writing, fmtDate } from '../../lib/content';
+
+export async function getStaticPaths() {
+  // Essays that live elsewhere (external) get no page here; the list links out instead.
+  return (await writing()).filter((w) => !w.data.external).map((w) => ({ params: { id: w.id }, props: { w } }));
+}
+const { w } = Astro.props;
+const { Content } = await render(w);
+---
+<Base title={w.data.title} description={w.data.summary} room>
+  <p class="small"><a href="/writing">← writing</a></p>
+  <article>
+    <h1>{w.data.title}</h1>
+    <p class="meta"><time datetime={w.data.date.toISOString()}>{fmtDate(w.data.date)}</time></p>
+    <Content />
+  </article>
+</Base>

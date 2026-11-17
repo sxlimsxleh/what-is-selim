@@ -1,0 +1,36 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const all = await getCollection('projects');
+  return all.map((p) => ({ params: { id: p.id }, props: { p } }));
+}
+const { p } = Astro.props;
+const { Content } = await render(p);
+const d = p.data;
+const label = { shipped: 'shipped', 'in-progress': 'in progress', research: 'research' } as const;
+const linkNames = { repo: 'code', demo: 'demo', paper: 'paper', video: 'video', site: 'website', instagram: 'instagram' } as const;
+const linkList = (Object.keys(linkNames) as (keyof typeof linkNames)[]).filter((k) => d.links[k]).map((k) => ({ href: d.links[k]!, label: linkNames[k] }));
+---
+<Base title={d.title} description={d.summary}>
+  <p class="small"><a href={d.section === 'research' ? '/research' : '/projects'}>← {d.section === 'research' ? 'paper & thesis' : 'projects'}</a></p>
+  <h1>{d.title}</h1>
+  <p>{d.summary}</p>
+  <p class="small dim">{label[d.status]} · {d.year} · {d.role}</p>
+  {d.cover && <Image src={d.cover.src} alt={d.cover.alt} widths={[480, 960]} sizes="(max-width: 640px) 100vw, 38rem" />}
+
+  {linkList.length > 0 && (
+    <ul class="list">{linkList.map((l) => <li><a href={l.href}>{l.label} ↗</a></li>)}</ul>
+  )}
+
+  <div class="body"><Content /></div>
+
+  {d.stack.length > 0 && (
+    <>
+      <h2>built with</h2>
+      <ul class="list">{d.stack.map((s) => <li>{s}</li>)}</ul>
+    </>
+  )}
+</Base>

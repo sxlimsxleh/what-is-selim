@@ -7,6 +7,7 @@ role: Guided research at TUM; co-author
 stack: [Python, PyTorch, cross-encoders, MExGen/C-LIME]
 links: { paper: "https://arxiv.org/abs/2606.03728" }
 featured: false
+section: research
 ---
 - Applied MExGen/C-LIME attribution to estimate paragraph-level influence on generated legal answers.
 - Trained a cross-encoder re-ranker with attribution-derived supervision.

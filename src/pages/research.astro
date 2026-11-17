@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import { cv, projects } from '../lib/content';
+const c = await cv();
+const items = await projects('research');
+---
+<Base title="paper & thesis" description="Selim Saleh's research: attribution-aware re-ranking for legal QA (ASAIL 2026) and an M.Sc. thesis on Egyptian Arabic LLMs.">
+  <h1>paper &amp; thesis.</h1>
+
+  <h2>the paper</h2>
+  <ul class="list">
+    {c.publications.map((pub) => (
+      <li>
+        {pub.url ? <a href={pub.url}><strong>{pub.title}</strong> ↗</a> : <strong>{pub.title}</strong>}
+        <span class="meta">{pub.authors.join(', ')}. {pub.venue}.</span>
+      </li>
+    ))}
+  </ul>
+
+  <h2>the work behind it</h2>
+  <ul class="list">
+    {items.map((p) => (
+      <li><a href={`/projects/${p.id}`}><strong>{p.data.title}</strong></a><span class="meta">{p.data.summary}</span></li>
+    ))}
+  </ul>
+</Base>

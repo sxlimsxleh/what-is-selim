@@ -31,7 +31,7 @@ I (Selim) will describe the look and feel in `DESIGN.md`. **Do not choose a visu
 - Deploy: Cloudflare Pages, Netlify or Vercel (free tier), from GitHub on every push; custom domain added later via config only
 - No backend, no database, no tracking cookies. If analytics are wanted later: privacy-friendly and cookie-less.
 
-## Content model (`src/content/` — starter files are in `content/` of this kit)
+## Content model (`src/content/`, rules in `src/content.config.ts`)
 
 - `projects`: title, slug, summary (1 line), status (`shipped` | `in-progress` | `research`), year, role, stack[], links {repo, demo, paper, video}, featured (bool), cover image, body (case study)
 - `writing`: title, date, summary, tags[], draft (bool), body

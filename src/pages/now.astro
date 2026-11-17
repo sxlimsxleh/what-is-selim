@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import { now, fmtDate } from '../lib/content';
+const n = await now();
+const sections = ['building', 'reading', 'watching', 'listening', 'playing', 'learning'] as const;
+---
+<Base title="now" description="What Selim Saleh is building, reading, watching and listening to right now." room>
+  <p class="small"><a href="/after-hours">← after hours</a></p>
+  <h1>now.</h1>
+  <p class="dim">updated <time datetime={n.updated.toISOString()}>{fmtDate(n.updated)}</time>.</p>
+  {sections.filter((k) => n[k].length > 0).map((k) => (
+    <section>
+      <h2>{k}</h2>
+      <ul class="list">
+        {n[k].map((i) => (
+          <li>
+            {i.url ? <a href={i.url}>{i.title}</a> : i.title}
+            {(i.by || i.note) && <span class="meta">{[i.by, i.note].filter(Boolean).join(' · ')}</span>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</Base>

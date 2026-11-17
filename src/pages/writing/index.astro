@@ -1,0 +1,21 @@
+---
+import Base from '../../layouts/Base.astro';
+import { writing, fmtMonth } from '../../lib/content';
+import { links } from '../../lib/site';
+const items = await writing();
+---
+<Base title="writing" description="Essays by Selim Saleh about time, cinema and moving away." room>
+  <p class="small"><a href="/after-hours">← after hours</a></p>
+  <h1>writing.</h1>
+  <p class="dim">essays about time, cinema and moving away. <a href="/rss.xml">rss</a></p>
+  <ul class="list">
+    {items.map((w) => (
+      <li>
+        <a href={w.data.external ?? `/writing/${w.id}`}><strong>{w.data.title}</strong>{w.data.external && ' ↗'}</a>
+        <span class="meta">{fmtMonth(w.data.date)}{w.data.external && ' · on substack'}</span>
+        <span class="meta">{w.data.summary}</span>
+      </li>
+    ))}
+  </ul>
+  <p><a href={links.substack}>everything on substack ↗</a></p>
+</Base>

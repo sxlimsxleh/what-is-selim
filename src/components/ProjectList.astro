@@ -1,0 +1,15 @@
+---
+import type { Project } from '../lib/content';
+interface Props { items: Project[] }
+const { items } = Astro.props;
+const label = { shipped: 'shipped', 'in-progress': 'in progress', research: 'research' } as const;
+---
+<ul class="list">
+  {items.map((p) => (
+    <li>
+      <a href={`/projects/${p.id}`}><strong>{p.data.title}</strong></a>
+      <span class="meta">{label[p.data.status]} · {p.data.year}</span>
+      <span class="meta">{p.data.summary}</span>
+    </li>
+  ))}
+</ul>

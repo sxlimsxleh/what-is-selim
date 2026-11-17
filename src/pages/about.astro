@@ -1,0 +1,35 @@
+---
+import Base from '../layouts/Base.astro';
+import Mail from '../components/Mail.astro';
+import { cv } from '../lib/content';
+import { links } from '../lib/site';
+const c = await cv();
+---
+<Base title="me" description="Selim Saleh: data & AI engineer in Munich, by way of Cairo.">
+  <h1>me.</h1>
+  <p>for a living, i code, engineer data and train LLMs. i also watch/make movies, read books, blast music, and rant (sometimes complain) about them all.</p>
+  <p>i left cairo with a carefully orchestrated plan. the plan changed. i kept the curiosity.</p>
+
+  <h2>career</h2>
+  <ul class="list">
+    {c.work.map((w) => (
+      <li><strong>ex-{w.org.toLowerCase()}</strong><span class="meta">{w.role.toLowerCase()}, {w.place.toLowerCase()}, {w.start.toLowerCase()} – {w.end.toLowerCase()}</span></li>
+    ))}
+  </ul>
+
+  <h2>education</h2>
+  <ul class="list">
+    {c.education.map((e) => (
+      <li>{e.degree}<span class="meta">{e.school}, {e.start} – {e.end}</span></li>
+    ))}
+  </ul>
+
+  <h2 id="contact">say hello</h2>
+  <ul class="list">
+    <li><Mail /> <noscript><span class="meta">the email link needs javascript; linkedin works too.</span></noscript></li>
+    <li><a href={links.linkedin}>linkedin</a></li>
+    <li><a href={links.github}>github</a></li>
+    <li><a href={links.letterboxd}>letterboxd</a></li>
+    <li><a href={links.substack}>substack</a></li>
+  </ul>
+</Base>

@@ -1,0 +1,23 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { fmtMonth } from '../../lib/content';
+const series = (await getCollection('photography')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+<Base title="photographs" description="Photography by Selim Saleh: series, mostly at night." room>
+  <p class="small"><a href="/after-hours">← after hours</a></p>
+  <h1>photographs.</h1>
+  {series.length === 0 && <p class="placeholder">the first series is coming soon.</p>}
+  <ul class="list">
+    {series.map((s) => (
+      <li>
+        <a href={`/photography/${s.id}`}>
+          <Image src={s.data.cover.src} alt={s.data.cover.alt} widths={[480, 960]} sizes="(max-width: 640px) 100vw, 38rem" />
+          <strong>{s.data.title}</strong>
+        </a>
+        <span class="meta">{fmtMonth(s.data.date)}{s.data.location && ` · ${s.data.location}`}</span>
+      </li>
+    ))}
+  </ul>
+</Base>
