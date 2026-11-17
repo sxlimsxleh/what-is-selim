@@ -1,0 +1,67 @@
+# The CV, in one place. /cv renders from this file.
+# Never add a phone number, home address or personal email here.
+selim:
+  name: Selim Saleh
+  headline: Data & AI engineer · M.Sc. Data Engineering and Analytics, TUM
+  location: Munich, Germany
+  available: Free from December 2026
+  about: >-
+    M.Sc. Data Engineering and Analytics student at TUM with a background spanning production data engineering,
+    machine learning and AI systems. I like building things that are technically solid and actually useful:
+    scalable cloud pipelines, retrieval systems, AI evaluation workflows.
+
+  work:
+    - role: Data Science and Engineering, Working Student
+      org: IONITY
+      place: Munich
+      start: Dec 2024
+      end: Nov 2026
+      points:
+        - Built schema-driven data-quality validation pipelines in Python (Pandas, PyArrow) on AWS (Athena, S3, Glue), orchestrated with Airflow.
+        - Automated checks for schema compliance, missing values, data types, categories, primary keys, partitions, timestamps and numerical constraints.
+        - Integrated validation into production pipelines; debugged Athena queries, Parquet schema mismatches, Glue jobs, dependency conflicts and CodeArtifact packaging.
+        - Refactored validation components (schema handling, partitioning, storage, error-code mapping, result aggregation) for maintainability and observability.
+    - role: Data Scientist
+      org: Tactful
+      place: Cairo
+      start: Nov 2022
+      end: Jan 2024
+      points:
+        - Designed and maintained ETL pipelines with Apache NiFi and Airflow across multiple client data sources.
+        - Built data cleaning, aggregation and preparation workflows for analytics and reporting.
+        - Worked directly with clients to gather requirements and deliver tailored data demos for non-technical stakeholders.
+
+  education:
+    - degree: M.Sc. Data Engineering and Analytics
+      school: Technical University of Munich
+      place: Munich
+      start: Apr 2024
+      end: present
+      note: "Focus: machine learning, NLP, information retrieval, foundation models, data engineering. Thesis: adapting a large language model to prefer Egyptian Arabic (submission planned Jan 2027)."
+    - degree: B.Sc. Media Engineering and Technology (Computer Science)
+      school: German University in Cairo
+      place: Cairo
+      start: "2017"
+      end: "2022"
+
+  publications:
+    - title: Re-Ranking Through an Attribution Lens for Citation Quality in Legal QA
+      authors: [Mohamed Hesham Elganayni, Selim Saleh, Matthias Grabmair]
+      venue: ASAIL 2026
+      year: 2026
+      url: https://arxiv.org/abs/2606.03728
+
+  skills:
+    - group: Programming & data science
+      items: [Python, Java, SQL, Pandas, NumPy, scikit-learn, Matplotlib]
+    - group: ML & AI
+      items: [NLP, LLMs, RAG, evaluation, PyTorch, TensorFlow]
+    - group: Data engineering
+      items: [Airflow, Apache NiFi, AWS (S3, Lambda, Athena, Glue), Docker, Kubernetes, ETL]
+    - group: Databases & tools
+      items: [PostgreSQL, MySQL, SQLite, Git, Linux, Power BI]
+
+  languages:
+    - { name: Arabic, level: Native }
+    - { name: English, level: C2 }
+    - { name: German, level: A2 }

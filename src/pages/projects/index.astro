@@ -1,0 +1,12 @@
+---
+import Base from '../../layouts/Base.astro';
+import ProjectList from '../../components/ProjectList.astro';
+import { projects } from '../../lib/content';
+const items = await projects('projects');
+---
+<Base title="projects" description="Projects by Selim Saleh: where he gets better at more tools and explores more things.">
+  <h1>projects.</h1>
+  <p>where i get better at more tools and explore more things. some of it ships, some of it is still on the bench.</p>
+  <ProjectList items={items} />
+  <p class="small dim">the paper and the thesis live on <a href="/research">their own page</a>.</p>
+</Base>

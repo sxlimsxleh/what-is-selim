@@ -4,8 +4,9 @@ summary: Adapting a large language model to prefer Egyptian Arabic dialect over 
 status: in-progress
 year: 2026
 role: M.Sc. thesis, TUM
-stack: [TODO]
+stack: []   # add once you are happy to share
 links: {}
 featured: false
+section: research
 ---
 TODO: add once you're happy to share details (methods, results), ideally after submission.

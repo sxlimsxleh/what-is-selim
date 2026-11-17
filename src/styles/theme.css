@@ -1,0 +1,38 @@
+/* Every design token lives here. Swap the look in this one file.
+   Values come from DESIGN.md: the work side is deep blue + greys, after hours is grey + some blue. */
+:root {
+  /* work side */
+  --frame: #17181b;
+  --sheet: #13244a;
+  --sheet-edge: #0e1b3a;
+  --ink: #d8dbe0;
+  --dim: #8e96a6;
+  --rule: #ffffff1f;
+
+  /* after hours */
+  --room: #d0d3d8;
+  --room-edge: #b3b8c0;
+  --room-ink: #262a31;
+  --room-dim: #5c626d;
+  --blue: #1f3f80;
+
+  /* type (system fonts until the design pass self-hosts Instrument Sans and Aref Ruqaa) */
+  --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-arabic: 'Aref Ruqaa', 'Noto Naskh Arabic', serif;
+  --text: 0.9375rem;
+  --small: 0.8125rem;
+  --title: 1.375rem;
+  --leading: 1.6;
+  --weight-title: 600;
+
+  /* space and shape */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2.5rem;
+  --space-6: 4rem;
+  --measure: 38rem;
+  --radius: 4px;
+  --radius-pill: 999px;
+}

@@ -1,0 +1,48 @@
+---
+import Base from '../layouts/Base.astro';
+import { cv } from '../lib/content';
+import { cvPdf } from '../lib/site';
+const c = await cv();
+---
+<Base title="cv" description={`${c.name}: ${c.headline}.`}>
+  <h1>cv.</h1>
+  <p>{c.name}. {c.headline}. {c.location}.{c.available && <> <strong>{c.available}.</strong></>}</p>
+  {cvPdf ? <p><a href={cvPdf} download>download the pdf</a></p> : <p class="placeholder small">pdf coming soon.</p>}
+  <p>{c.about}</p>
+
+  <h2>work</h2>
+  {c.work.map((w) => (
+    <section>
+      <h3>{w.role} · {w.org}</h3>
+      <p class="meta">{w.place} · {w.start} – {w.end}</p>
+      <ul class="list">{w.points.map((pt) => <li>{pt}</li>)}</ul>
+    </section>
+  ))}
+
+  <h2>education</h2>
+  {c.education.map((e) => (
+    <section>
+      <h3>{e.degree}</h3>
+      <p class="meta">{e.school}{e.place && `, ${e.place}`} · {e.start} – {e.end}</p>
+      {e.note && <p>{e.note}</p>}
+    </section>
+  ))}
+
+  <h2>publications</h2>
+  <ul class="list">
+    {c.publications.map((p) => (
+      <li>{p.url ? <a href={p.url}>{p.title}</a> : p.title}<span class="meta">{p.authors.join(', ')}. {p.venue}.</span></li>
+    ))}
+  </ul>
+
+  <h2>skills</h2>
+  {c.skills.map((s) => (
+    <section>
+      <h3>{s.group}</h3>
+      <ul class="list">{s.items.map((i) => <li>{i}</li>)}</ul>
+    </section>
+  ))}
+
+  <h2>languages</h2>
+  <ul class="list">{c.languages.map((l) => <li>{l.name}<span class="meta">{l.level}</span></li>)}</ul>
+</Base>

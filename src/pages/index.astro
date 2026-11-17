@@ -1,0 +1,28 @@
+---
+// Placeholder home. The drawn journey (design/sketch/journey.html) replaces this in the design milestone.
+import Base from '../layouts/Base.astro';
+import ProjectList from '../components/ProjectList.astro';
+import { featured } from '../lib/content';
+import { site } from '../lib/site';
+const top = await featured();
+---
+<Base>
+  <h1 lang="ar" class="arabic">سليم</h1>
+  <p class="dim small">selim, in arabic.</p>
+  <p>{site.line}</p>
+
+  <h2>where to go</h2>
+  <ul class="list">
+    <li><a href="/about">me</a><span class="meta">cairo to munich, ionity, tactful</span></li>
+    <li><a href="/research">the paper &amp; the thesis</a><span class="meta">asail 2026, and teaching a model egyptian arabic</span></li>
+    <li><a href="/projects">projects</a><span class="meta">where i get better at more tools</span></li>
+    <li><a href="/after-hours">after hours →</a><span class="meta">books, writing, films, songs, photographs</span></li>
+  </ul>
+
+  <h2>featured projects</h2>
+  <ProjectList items={top} />
+</Base>
+
+<style>
+  .arabic { font-family: var(--font-arabic); font-size: 3rem; text-decoration: none; margin-bottom: 0; }
+</style>

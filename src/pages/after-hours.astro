@@ -1,0 +1,22 @@
+---
+// Placeholder for the coffee table (design/sketch/after-hours.html), which arrives in the design milestone.
+import Base from '../layouts/Base.astro';
+import { songs, songUrl, links } from '../lib/site';
+---
+<Base title="after hours" description="After hours: what Selim Saleh reads, writes, watches, listens to and photographs." room>
+  <p class="small"><a href="/">← back to the work</a></p>
+  <h1>after hours.</h1>
+  <p class="dim">what's on the table when i'm not working.</p>
+  <ul class="list">
+    <li><a href="/writing">writing</a><span class="meta">essays about time, cinema and moving away</span></li>
+    <li><a href="/films">films</a><span class="meta">things i wrote and directed · <a href={links.letterboxd}>letterboxd</a></span></li>
+    <li><a href="/photography">photographs</a><span class="meta">series, mostly at night</span></li>
+    <li><a href="/now">now</a><span class="meta">building, reading, watching, listening</span></li>
+    <li><span class="placeholder">books: coming soon</span></li>
+  </ul>
+
+  <h2>songs</h2>
+  <ul class="list">
+    {songs.map((s) => <li><a href={songUrl(s)}>{s.title}</a><span class="meta">{s.artist}</span></li>)}
+  </ul>
+</Base>

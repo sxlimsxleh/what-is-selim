@@ -1,0 +1,13 @@
+---
+// An email link that never has the address written in the HTML.
+// The browser puts it together; without JavaScript it points to the contact section instead.
+import { email } from '../lib/site';
+interface Props { label?: string }
+const { label = 'email' } = Astro.props;
+---
+<a class="mail" href="/about#contact" data-u={email.user} data-d={email.domain}>{label}</a>
+<script>
+  document.querySelectorAll<HTMLAnchorElement>('a.mail[data-u]').forEach((a) => {
+    a.href = 'mailto:' + a.dataset.u + '@' + a.dataset.d;
+  });
+</script>
